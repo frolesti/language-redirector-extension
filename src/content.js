@@ -19,12 +19,12 @@ function checkAndRedirect() {
         return;
     }
 
+    let targetUrl = null;
+
     // 1. Estratègia Hreflang (Mètode estàndard i més fiable)
     // Busquem els tags <link rel="alternate" hreflang="...">
     const alternates = document.querySelectorAll('link[rel="alternate"][hreflang]');
     
-    let targetUrl = null;
-
     if (alternates.length > 0) {
         // Iterem per trobar si hi ha una versió en el nostre idioma
         alternates.forEach(link => {
