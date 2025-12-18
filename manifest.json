@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Auto Language Redirector",
-  "version": "1.1",
-  "description": "Detecta si una pàgina té versió en el teu idioma i et redirigeix automàticament.",
+  "name": "Euskaraz Mesedez",
+  "version": "1.0",
+  "description": "Automatikoki euskaraz nabigatu ahal denean.",
   "permissions": [
     "storage"
   ],
