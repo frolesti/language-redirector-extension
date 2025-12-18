@@ -1,16 +1,26 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const langInput = document.getElementById('language');
+  const langSelect = document.getElementById('language');
   const saveBtn = document.getElementById('save');
   const status = document.getElementById('status');
 
+  // Populate dropdown
+  if (typeof languages !== 'undefined') {
+    languages.forEach(lang => {
+      const option = document.createElement('option');
+      option.value = lang.code;
+      option.textContent = `${lang.name} (${lang.code})`;
+      langSelect.appendChild(option);
+    });
+  }
+
   // Carregar configuració actual
   chrome.storage.sync.get(['preferredLanguage'], (result) => {
-    langInput.value = result.preferredLanguage || 'ca';
+    langSelect.value = result.preferredLanguage || 'ca';
   });
 
   // Guardar configuració
   saveBtn.addEventListener('click', () => {
-    const lang = langInput.value.trim().toLowerCase();
+    const lang = langSelect.value;
     if (lang) {
       chrome.storage.sync.set({ preferredLanguage: lang }, () => {
         status.textContent = 'Configuració guardada!';

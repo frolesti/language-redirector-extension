@@ -10,29 +10,62 @@ function checkAndRedirect() {
     // Obtenim l'idioma actual de la pàgina (atribut lang del tag html)
     const currentLang = document.documentElement.lang || '';
 
+    // Normalitzem per comparar només el codi d'idioma principal (ex: 'ca-ES' -> 'ca')
+    const simplePreferred = preferredLang.split('-')[0].toLowerCase();
+    const simpleCurrent = currentLang.split('-')[0].toLowerCase();
+
     // Si ja estem en l'idioma preferit, no fem res.
-    // Utilitzem startsWith per cobrir casos com 'ca-ES' quan busquem 'ca'
-    if (currentLang.toLowerCase().startsWith(preferredLang.toLowerCase())) {
+    if (simpleCurrent === simplePreferred) {
         return;
     }
 
+    // 1. Estratègia Hreflang (Mètode estàndard i més fiable)
     // Busquem els tags <link rel="alternate" hreflang="...">
     const alternates = document.querySelectorAll('link[rel="alternate"][hreflang]');
     
-    if (alternates.length === 0) return;
-
     let targetUrl = null;
 
-    // Iterem per trobar si hi ha una versió en el nostre idioma
-    alternates.forEach(link => {
-      const hreflang = link.getAttribute('hreflang').toLowerCase();
-      
-      // Comprovem si el hreflang coincideix amb la preferència
-      // Acceptem coincidència exacta o prefix (ex: 'en' accepta 'en-US')
-      if (hreflang === preferredLang.toLowerCase() || hreflang.startsWith(preferredLang.toLowerCase() + '-')) {
-        targetUrl = link.href;
-      }
-    });
+    if (alternates.length > 0) {
+        // Iterem per trobar si hi ha una versió en el nostre idioma
+        alternates.forEach(link => {
+            const hreflang = link.getAttribute('hreflang').toLowerCase();
+            
+            // Comprovem si el hreflang coincideix amb la preferència
+            if (hreflang === preferredLang.toLowerCase() || hreflang.startsWith(preferredLang.toLowerCase() + '-')) {
+                targetUrl = link.href;
+            }
+        });
+    }
+
+    // 2. Estratègia de Reemplaçament d'URL (Fallback)
+    // Si no hem trobat hreflang, intentem deduir la URL canviant el segment de l'idioma a la URL.
+    // Això serveix per webs com https://www.barcelona.cat/es/ que no tinguin hreflang definit (tot i que barcelona.cat sí que en té).
+    if (!targetUrl && currentLang) {
+        try {
+            const currentUrl = new URL(window.location.href);
+            const pathSegments = currentUrl.pathname.split('/');
+            
+            // Busquem si algun segment del path coincideix amb l'idioma actual (ex: 'es' o 'es-ES')
+            const langIndex = pathSegments.findIndex(segment => 
+                segment.toLowerCase() === currentLang.toLowerCase() || 
+                segment.toLowerCase() === simpleCurrent
+            );
+
+            if (langIndex !== -1) {
+                // Reemplacem pel codi preferit (simple, normalment és el que es fa servir a les URLs)
+                pathSegments[langIndex] = simplePreferred;
+                currentUrl.pathname = pathSegments.join('/');
+                
+                // Verifiquem que la URL ha canviat
+                if (currentUrl.href !== window.location.href) {
+                    targetUrl = currentUrl.href;
+                    console.log(`Auto Language Redirector: URL deduïda per patró: ${targetUrl}`);
+                }
+            }
+        } catch (e) {
+            console.error("Error intentant deduir la URL:", e);
+        }
+    }
 
     // Si hem trobat una URL i és diferent de l'actual, redirigim
     if (targetUrl && targetUrl !== window.location.href) {
