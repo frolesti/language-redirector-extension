@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Auto Language Redirector",
+  "version": "1.0",
+  "description": "Detecta si una pàgina té versió en el teu idioma i et redirigeix automàticament.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
