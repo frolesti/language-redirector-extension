@@ -6,8 +6,16 @@
   "permissions": [
     "storage"
   ],
+  "icons": {
+    "48": "icons/logo.png",
+    "128": "icons/logo.png"
+  },
   "action": {
-    "default_popup": "src/popup/popup.html"
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "48": "icons/logo.png",
+      "128": "icons/logo.png"
+    }
   },
   "content_scripts": [
     {
