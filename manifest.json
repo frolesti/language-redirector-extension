@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Auto Language Redirector",
-  "version": "1.1",
-  "description": "Detecta si una pàgina té versió en el teu idioma i et redirigeix automàticament.",
+  "name": "En Català Siusplau",
+  "version": "1.0",
+  "description": "Navega automàticament en català sempre que sigui possible.",
   "permissions": [
     "storage"
   ],
