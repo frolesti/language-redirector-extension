@@ -20,7 +20,7 @@ function Fix-Icon {
 
     $img = [System.Drawing.Image]::FromFile($SourcePath)
     $canvasSize = 128
-    $iconSize = 96
+    $iconSize = 128 # Increased from 96 to use full size
 
     # Calculate scaling
     $ratioX = $iconSize / $img.Width
@@ -31,6 +31,16 @@ function Fix-Icon {
     $newHeight = [int]($img.Height * $ratio)
 
     $bmp = New-Object System.Drawing.Bitmap($canvasSize, $canvasSize)
+    # Make white transparent on the new bitmap if we were drawing directly, 
+    # but we need to process the source image or draw it then make transparent.
+    # Better approach: Make the source image transparent if it has white background.
+    # Note: This is a simple color key. It might affect white parts inside the logo.
+    # Given the request "remove white background", we'll try this.
+    
+    # Create a temporary bitmap to process transparency
+    $tempBmp = New-Object System.Drawing.Bitmap($img)
+    $tempBmp.MakeTransparent([System.Drawing.Color]::White)
+
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
@@ -40,9 +50,10 @@ function Fix-Icon {
     $posX = ($canvasSize - $newWidth) / 2
     $posY = ($canvasSize - $newHeight) / 2
 
-    $g.DrawImage($img, $posX, $posY, $newWidth, $newHeight)
+    $g.DrawImage($tempBmp, $posX, $posY, $newWidth, $newHeight)
     $bmp.Save($DestPath, [System.Drawing.Imaging.ImageFormat]::Png)
 
+    $tempBmp.Dispose()
     $img.Dispose()
     $g.Dispose()
     $bmp.Dispose()
@@ -64,12 +75,15 @@ foreach ($lang in $languages) {
     $popupHtml = $popupHtml.Replace("{{POPUP_TEXT}}", $cfg.popupText)
     $popupHtml = $popupHtml.Replace("{{DONATE_TEXT}}", $cfg.donateText)
     $popupHtml = $popupHtml.Replace("{{REPORT_TEXT}}", $cfg.reportText)
+    $popupHtml = $popupHtml.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
     Set-Content -Path "src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 
     # Process Popup JS
     $popupJs = Get-Content -Raw -Path "src/popup/popup.template.js"
     $popupJs = $popupJs.Replace("{{PREFERRED_LANGUAGE}}", $cfg.preferredLanguage)
     $popupJs = $popupJs.Replace("{{REPORT_SUBJECT}}", [System.Uri]::EscapeDataString($cfg.reportSubject))
+    $popupJs = $popupJs.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
+    $popupJs = $popupJs.Replace("{{DISABLE_TEXT}}", $cfg.disableText)
     Set-Content -Path "src/popup/popup.js" -Value $popupJs -Encoding UTF8
 
     # Fix Icon

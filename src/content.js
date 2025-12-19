@@ -1,8 +1,14 @@
 ﻿// src/content.js
 
 function checkAndRedirect() {
-  // Recuperem l'idioma preferit de la configuració (per defecte 'ca')
-  chrome.storage.sync.get(['preferredLanguage'], function(result) {
+  // Recuperem l'idioma preferit i l'estat d'activació
+  chrome.storage.sync.get(['preferredLanguage', 'isEnabled'], function(result) {
+    // Si està desactivat explícitament, no fem res
+    if (result.isEnabled === false) {
+        console.log('Auto Language Redirector: Extensió desactivada per l\'usuari.');
+        return;
+    }
+
     const preferredLang = result.preferredLanguage || 'ca';
     
     console.log('Auto Language Redirector: Idioma preferit és', preferredLang);

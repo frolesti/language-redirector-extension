@@ -9,6 +9,8 @@
     "donateText": "Fes-te mecenes a Aixeta.cat",
     "reportText": "Reportar un error",
     "reportSubject": "Error - En Català Siusplau",
+    "enableText": "Activat",
+    "disableText": "Desactivat",
     "iconSource": "icons/logo_ca.png"
   },
   "gl": {
@@ -21,6 +23,8 @@
     "donateText": "Apoiar o proxecto (Aixeta.cat)",
     "reportText": "Informar dun erro",
     "reportSubject": "Erro - En Galego Por Favor",
+    "enableText": "Activado",
+    "disableText": "Desactivado",
     "iconSource": "icons/logo_gl.png"
   },
   "eu": {
@@ -33,6 +37,8 @@
     "donateText": "Lagundu proiektua (Aixeta.cat)",
     "reportText": "Eman errore baten berri",
     "reportSubject": "Errorea - Euskaraz Mesedez",
+    "enableText": "Aktibatuta",
+    "disableText": "Desaktibatuta",
     "iconSource": "icons/logo_eu.png"
   }
 }
