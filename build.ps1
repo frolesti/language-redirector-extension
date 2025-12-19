@@ -56,7 +56,7 @@ foreach ($lang in $languages) {
     $manifest = Get-Content -Raw -Path "manifest.template.json"
     $manifest = $manifest.Replace("{{NAME}}", $cfg.name)
     $manifest = $manifest.Replace("{{DESCRIPTION}}", $cfg.description)
-    Set-Content -Path "manifest.json" -Value $manifest
+    Set-Content -Path "manifest.json" -Value $manifest -Encoding UTF8
 
     # Process Popup HTML
     $popupHtml = Get-Content -Raw -Path "src/popup/popup.template.html"
@@ -64,13 +64,13 @@ foreach ($lang in $languages) {
     $popupHtml = $popupHtml.Replace("{{POPUP_TEXT}}", $cfg.popupText)
     $popupHtml = $popupHtml.Replace("{{DONATE_TEXT}}", $cfg.donateText)
     $popupHtml = $popupHtml.Replace("{{REPORT_TEXT}}", $cfg.reportText)
-    Set-Content -Path "src/popup/popup.html" -Value $popupHtml
+    Set-Content -Path "src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 
     # Process Popup JS
     $popupJs = Get-Content -Raw -Path "src/popup/popup.template.js"
     $popupJs = $popupJs.Replace("{{PREFERRED_LANGUAGE}}", $cfg.preferredLanguage)
     $popupJs = $popupJs.Replace("{{REPORT_SUBJECT}}", [System.Uri]::EscapeDataString($cfg.reportSubject))
-    Set-Content -Path "src/popup/popup.js" -Value $popupJs
+    Set-Content -Path "src/popup/popup.js" -Value $popupJs -Encoding UTF8
 
     # Fix Icon
     $iconSource = $cfg.iconSource

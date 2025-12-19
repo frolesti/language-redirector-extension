@@ -1,8 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // Forcem l'idioma en instal·lar/obrir
+﻿document.addEventListener('DOMContentLoaded', () => {
+  // Forcem l'idioma en instalÂ·lar/obrir
   chrome.storage.sync.set({ preferredLanguage: 'eu' });
 
-  // Botó de donació
+  // BotÃ³ de donaciÃ³
   const donateBtn = document.getElementById('donate');
   if (donateBtn) {
     donateBtn.addEventListener('click', () => {
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botó de reportar error
+  // BotÃ³ de reportar error
   const reportBtn = document.getElementById('report');
   if (reportBtn) {
     reportBtn.addEventListener('click', () => {

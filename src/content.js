@@ -1,16 +1,16 @@
-// src/content.js
+Ôªø// src/content.js
 
 function checkAndRedirect() {
-  // Recuperem l'idioma preferit de la configuraciÛ (per defecte 'ca')
+  // Recuperem l'idioma preferit de la configuraci√≥ (per defecte 'ca')
   chrome.storage.sync.get(['preferredLanguage'], function(result) {
     const preferredLang = result.preferredLanguage || 'ca';
     
-    console.log('Auto Language Redirector: Idioma preferit Ès', preferredLang);
+    console.log('Auto Language Redirector: Idioma preferit √©s', preferredLang);
 
-    // Obtenim l'idioma actual de la p‡gina (atribut lang del tag html)
+    // Obtenim l'idioma actual de la p√†gina (atribut lang del tag html)
     const currentLang = document.documentElement.lang || '';
 
-    // Normalitzem per comparar nomÈs el codi d'idioma principal (ex: 'ca-ES' -> 'ca')
+    // Normalitzem per comparar nom√©s el codi d'idioma principal (ex: 'ca-ES' -> 'ca')
     const simplePreferred = preferredLang.split('-')[0].toLowerCase();
     const simpleCurrent = currentLang.split('-')[0].toLowerCase();
 
@@ -21,25 +21,25 @@ function checkAndRedirect() {
 
     let targetUrl = null;
 
-    // 1. EstratËgia Hreflang (MËtode est‡ndard i mÈs fiable)
+    // 1. Estrat√®gia Hreflang (M√®tode est√†ndard i m√©s fiable)
     // Busquem els tags <link rel="alternate" hreflang="...">
     const alternates = document.querySelectorAll('link[rel="alternate"][hreflang]');
     
     if (alternates.length > 0) {
-        // Iterem per trobar si hi ha una versiÛ en el nostre idioma
+        // Iterem per trobar si hi ha una versi√≥ en el nostre idioma
         alternates.forEach(link => {
             const hreflang = link.getAttribute('hreflang').toLowerCase();
             
-            // Comprovem si el hreflang coincideix amb la preferËncia
+            // Comprovem si el hreflang coincideix amb la prefer√®ncia
             if (hreflang === preferredLang.toLowerCase() || hreflang.startsWith(preferredLang.toLowerCase() + '-')) {
                 targetUrl = link.href;
             }
         });
     }
 
-    // 2. EstratËgia de ReemplaÁament d'URL (Fallback)
+    // 2. Estrat√®gia de Reempla√ßament d'URL (Fallback)
     // Si no hem trobat hreflang, intentem deduir la URL canviant el segment de l'idioma a la URL.
-    // AixÚ serveix per webs com https://www.barcelona.cat/es/ que no tinguin hreflang definit (tot i que barcelona.cat sÌ que en tÈ).
+    // Aix√≤ serveix per webs com https://www.barcelona.cat/es/ que no tinguin hreflang definit (tot i que barcelona.cat s√≠ que en t√©).
     if (!targetUrl && currentLang) {
         try {
             const currentUrl = new URL(window.location.href);
@@ -52,14 +52,14 @@ function checkAndRedirect() {
             );
 
             if (langIndex !== -1) {
-                // Reemplacem pel codi preferit (simple, normalment Ès el que es fa servir a les URLs)
+                // Reemplacem pel codi preferit (simple, normalment √©s el que es fa servir a les URLs)
                 pathSegments[langIndex] = simplePreferred;
                 currentUrl.pathname = pathSegments.join('/');
                 
                 // Verifiquem que la URL ha canviat
                 if (currentUrl.href !== window.location.href) {
                     const potentialUrl = currentUrl.href;
-                    console.log('Auto Language Redirector: URL deduÔda per patrÛ: ' + potentialUrl + '. Verificant existËncia...');
+                    console.log('Auto Language Redirector: URL dedu√Øda per patr√≥: ' + potentialUrl + '. Verificant exist√®ncia...');
                     
                     // Verifiquem si la URL existeix abans de redirigir (HEAD request)
                     fetch(potentialUrl, { method: 'HEAD' })
@@ -68,7 +68,7 @@ function checkAndRedirect() {
                                 console.log('Auto Language Redirector: URL verificada (' + response.status + '). Redirigint...');
                                 window.location.href = potentialUrl;
                             } else {
-                                console.log('Auto Language Redirector: La URL deduÔda no existeix (' + response.status + '). S''avorta la redirecciÛ.');
+                                console.log('Auto Language Redirector: La URL dedu√Øda no existeix (' + response.status + '). S''avorta la redirecci√≥.');
                             }
                         })
                         .catch(err => {
@@ -80,11 +80,11 @@ function checkAndRedirect() {
             console.error("Error intentant deduir la URL:", e);
         }
     } else if (targetUrl && targetUrl !== window.location.href) {
-      console.log('Auto Language Redirector: P‡gina detectada per hreflang en ' + preferredLang + '. Redirigint...');
+      console.log('Auto Language Redirector: P√†gina detectada per hreflang en ' + preferredLang + '. Redirigint...');
       window.location.href = targetUrl;
     }
   });
 }
 
-// Executem la comprovaciÛ
+// Executem la comprovaci√≥
 checkAndRedirect();
