@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Euskaraz Mesedez",
+  "name": "{{NAME}}",
   "version": "1.0",
-  "description": "Nabigatu automatikoki euskaraz ahal den guztietan.",
+  "description": "{{DESCRIPTION}}",
   "permissions": [
     "storage"
   ],
@@ -25,4 +25,3 @@
     }
   ]
 }
-

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Forcem l'idioma en instal·lar/obrir
-  chrome.storage.sync.set({ preferredLanguage: 'eu' });
+  chrome.storage.sync.set({ preferredLanguage: '{{PREFERRED_LANGUAGE}}' });
 
   // Botó de donació
   const donateBtn = document.getElementById('donate');
@@ -14,8 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reportBtn = document.getElementById('report');
   if (reportBtn) {
     reportBtn.addEventListener('click', () => {
-      chrome.tabs.update({ url: 'mailto:frolesti4@gmail.com?subject=Errorea%20-%20Euskaraz%20Mesedez' });
+      chrome.tabs.update({ url: 'mailto:frolesti4@gmail.com?subject={{REPORT_SUBJECT}}' });
     });
   }
 });
-
