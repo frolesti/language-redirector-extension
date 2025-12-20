@@ -71,10 +71,10 @@ function checkAndRedirect() {
                     fetch(potentialUrl, { method: 'HEAD' })
                         .then(response => {
                             if (response.ok) {
-                                console.log('Auto Language Redirector: URL verificada (' + response.status + '). Redirigint...');
+                                console.log(`Auto Language Redirector: URL verificada (${response.status}). Redirigint...`);
                                 window.location.href = potentialUrl;
                             } else {
-                                console.log('Auto Language Redirector: La URL deduïda no existeix (' + response.status + '). S\'avorta la redirecció.');
+                                console.log(`Auto Language Redirector: La URL deduïda no existeix (${response.status}). S'avorta la redirecció.`);
                             }
                         })
                         .catch(err => {
