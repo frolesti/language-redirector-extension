@@ -7,7 +7,7 @@ $languages = if ($Language -eq "all") { $config.PSObject.Properties.Name } else 
 
 Add-Type -AssemblyName System.Drawing
 
-function Fix-Icon {
+function Update-Icon {
     param (
         [string]$SourcePath,
         [string]$DestPath
@@ -91,7 +91,7 @@ foreach ($lang in $languages) {
     if (-not (Test-Path $iconSource)) {
         Write-Warning "Icon source $iconSource not found for $lang"
     } else {
-        Fix-Icon -SourcePath $iconSource -DestPath "icons/logo.png"
+        Update-Icon -SourcePath $iconSource -DestPath "icons/logo.png"
     }
 
     # Zip
