@@ -86,7 +86,7 @@ foreach ($lang in $languages) {
     $popupJs = $popupJs.Replace("{{DISABLE_TEXT}}", $cfg.disableText)
     Set-Content -Path "src/popup/popup.js" -Value $popupJs -Encoding UTF8
 
-    # Fix Icon
+    # Update Icon
     $iconSource = $cfg.iconSource
     if (-not (Test-Path $iconSource)) {
         Write-Warning "Icon source $iconSource not found for $lang"
