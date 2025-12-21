@@ -86,16 +86,20 @@ function checkAndRedirect() {
                 if (currentUrl.href !== window.location.href) {
                     potentialUrl = currentUrl.href;
                 }
-            } else {
-                // CAS B: Injecció de Prefix (ex: /hola -> /ca/hola)
-                // Això passa quan la URL base no té codi d'idioma (sol ser l'idioma per defecte)
-                // Evitem bucles infinits: si el primer segment ja és l'idioma preferit, no fem res.
-                if (pathSegments[1] !== simplePreferred) {
-                    const newPathSegments = ['', simplePreferred, ...pathSegments.slice(1)];
-                    currentUrl.pathname = newPathSegments.join('/');
-                    potentialUrl = currentUrl.href;
-                }
-            }
+            } 
+            // else {
+            //    // CAS B: Injecció de Prefix (ex: /hola -> /ca/hola)
+            //    // DESACTIVAT: Aquesta estratègia és massa agressiva i trenca llocs com YouTube (ex: youtube.com/watch -> youtube.com/ca/watch).
+            //    // Només farem servir reemplaçament si detectem un codi d'idioma existent a la URL.
+            //    
+            //    /*
+            //    if (pathSegments[1] !== simplePreferred) {
+            //        const newPathSegments = ['', simplePreferred, ...pathSegments.slice(1)];
+            //        currentUrl.pathname = newPathSegments.join('/');
+            //        potentialUrl = currentUrl.href;
+            //    }
+            //    */
+            // }
 
             if (potentialUrl) {
                 // console.log('Auto Language Redirector: URL deduïda (' + (langIndex !== -1 ? 'reemplaçament' : 'injecció') + '): ' + potentialUrl + '. Verificant existència...');
