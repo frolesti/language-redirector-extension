@@ -2,7 +2,7 @@ param (
     [string]$Language = "all"
 )
 
-$config = Get-Content -Raw -Path "config.json" | ConvertFrom-Json
+$config = Get-Content -Raw -Path "config.json" -Encoding UTF8 | ConvertFrom-Json
 $languages = if ($Language -eq "all") { $config.PSObject.Properties.Name } else { @($Language) }
 
 Add-Type -AssemblyName System.Drawing
@@ -64,13 +64,13 @@ foreach ($lang in $languages) {
     $cfg = $config.$lang
 
     # Process Manifest
-    $manifest = Get-Content -Raw -Path "manifest.template.json"
+    $manifest = Get-Content -Raw -Path "manifest.template.json" -Encoding UTF8
     $manifest = $manifest.Replace("{{NAME}}", $cfg.name)
     $manifest = $manifest.Replace("{{DESCRIPTION}}", $cfg.description)
     Set-Content -Path "manifest.json" -Value $manifest -Encoding UTF8
 
     # Process Popup HTML
-    $popupHtml = Get-Content -Raw -Path "src/popup/popup.template.html"
+    $popupHtml = Get-Content -Raw -Path "src/popup/popup.template.html" -Encoding UTF8
     $popupHtml = $popupHtml.Replace("{{POPUP_TITLE}}", $cfg.popupTitle)
     $popupHtml = $popupHtml.Replace("{{POPUP_TEXT}}", $cfg.popupText)
     $popupHtml = $popupHtml.Replace("{{DONATE_TEXT}}", $cfg.donateText)
@@ -79,7 +79,7 @@ foreach ($lang in $languages) {
     Set-Content -Path "src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 
     # Process Popup JS
-    $popupJs = Get-Content -Raw -Path "src/popup/popup.template.js"
+    $popupJs = Get-Content -Raw -Path "src/popup/popup.template.js" -Encoding UTF8
     $popupJs = $popupJs.Replace("{{PREFERRED_LANGUAGE}}", $cfg.preferredLanguage)
     $popupJs = $popupJs.Replace("{{REPORT_SUBJECT}}", [System.Uri]::EscapeDataString($cfg.reportSubject))
     $popupJs = $popupJs.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
