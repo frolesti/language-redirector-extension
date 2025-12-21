@@ -87,13 +87,15 @@ foreach ($lang in $languages) {
     Set-Content -Path "src/popup/popup.js" -Value $popupJs -Encoding UTF8
 
     # Update Icon
+    if (-not (Test-Path "icons")) {
+        New-Item -ItemType Directory -Path "icons" -Force | Out-Null
+    }
+
     $iconSource = $cfg.iconSource
-    $storeIconPath = "icons/store_icon_$lang.png"
     if (-not (Test-Path $iconSource)) {
         Write-Warning "Icon source $iconSource not found for $lang"
     } else {
-        Update-Icon -SourcePath $iconSource -DestPath $storeIconPath
-        Copy-Item -Path $storeIconPath -Destination "icons/logo.png" -Force
+        Update-Icon -SourcePath $iconSource -DestPath "icons/logo.png"
     }
 
     # Zip

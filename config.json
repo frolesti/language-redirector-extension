@@ -11,7 +11,7 @@
     "reportSubject": "Error - En Català Siusplau",
     "enableText": "Activat",
     "disableText": "Desactivat",
-    "iconSource": "icons/logo_ca.png"
+    "iconSource": "assets/img/icons/logo_ca.png"
   },
   "gl": {
     "name": "En Galego Por Favor",
@@ -25,7 +25,7 @@
     "reportSubject": "Erro - En Galego Por Favor",
     "enableText": "Activado",
     "disableText": "Desactivado",
-    "iconSource": "icons/logo_gl.png"
+    "iconSource": "assets/img/icons/logo_gl.png"
   },
   "eu": {
     "name": "Euskaraz Mesedez",
@@ -39,6 +39,6 @@
     "reportSubject": "Errorea - Euskaraz Mesedez",
     "enableText": "Aktibatuta",
     "disableText": "Desaktibatuta",
-    "iconSource": "icons/logo_eu.png"
+    "iconSource": "assets/img/icons/logo_eu.png"
   }
 }
