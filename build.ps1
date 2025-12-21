@@ -20,7 +20,7 @@ function Update-Icon {
 
     $img = [System.Drawing.Image]::FromFile($SourcePath)
     $canvasSize = 128
-    $iconSize = 128 # Increased from 96 to use full size
+    $iconSize = 96 # Set to 96 to leave 16px padding as per Chrome Web Store requirements
 
     # Calculate scaling
     $ratioX = $iconSize / $img.Width
@@ -88,10 +88,12 @@ foreach ($lang in $languages) {
 
     # Update Icon
     $iconSource = $cfg.iconSource
+    $storeIconPath = "icons/store_icon_$lang.png"
     if (-not (Test-Path $iconSource)) {
         Write-Warning "Icon source $iconSource not found for $lang"
     } else {
-        Update-Icon -SourcePath $iconSource -DestPath "icons/logo.png"
+        Update-Icon -SourcePath $iconSource -DestPath $storeIconPath
+        Copy-Item -Path $storeIconPath -Destination "icons/logo.png" -Force
     }
 
     # Zip
