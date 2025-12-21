@@ -43,44 +43,55 @@ function checkAndRedirect() {
         });
     }
 
-    // 2. Estratègia de Reemplaçament d'URL (Fallback)
-    // Si no hem trobat hreflang, intentem deduir la URL canviant el segment de l'idioma a la URL.
-    // Això serveix per webs com https://www.barcelona.cat/es/ que no tinguin hreflang definit (tot i que barcelona.cat sí que en té).
-    if (!targetUrl && currentLang) {
+    // 2. Estratègia de Reemplaçament d'URL o Injecció de Prefix (Fallback)
+    // Si no hem trobat hreflang, intentem deduir la URL.
+    if (!targetUrl) {
         try {
             const currentUrl = new URL(window.location.href);
             const pathSegments = currentUrl.pathname.split('/');
             
             // Busquem si algun segment del path coincideix amb l'idioma actual (ex: 'es' o 'es-ES')
             const langIndex = pathSegments.findIndex(segment => 
-                segment.toLowerCase() === currentLang.toLowerCase() || 
-                segment.toLowerCase() === simpleCurrent
+                (currentLang && segment.toLowerCase() === currentLang.toLowerCase()) || 
+                (simpleCurrent && segment.toLowerCase() === simpleCurrent)
             );
 
+            let potentialUrl = null;
+
             if (langIndex !== -1) {
-                // Reemplacem pel codi preferit (simple, normalment és el que es fa servir a les URLs)
+                // CAS A: Reemplaçament (ex: /es/hola -> /ca/hola)
                 pathSegments[langIndex] = simplePreferred;
                 currentUrl.pathname = pathSegments.join('/');
-                
-                // Verifiquem que la URL ha canviat
                 if (currentUrl.href !== window.location.href) {
-                    const potentialUrl = currentUrl.href;
-                    console.log('Auto Language Redirector: URL deduïda per patró: ' + potentialUrl + '. Verificant existència...');
-                    
-                    // Verifiquem si la URL existeix abans de redirigir (HEAD request)
-                    fetch(potentialUrl, { method: 'HEAD' })
-                        .then(response => {
-                            if (response.ok) {
-                                console.log(`Auto Language Redirector: URL verificada (${response.status}). Redirigint...`);
-                                window.location.href = potentialUrl;
-                            } else {
-                                console.log(`Auto Language Redirector: La URL deduïda no existeix (${response.status}). S'avorta la redirecció.`);
-                            }
-                        })
-                        .catch(err => {
-                            console.log('Auto Language Redirector: Error verificant URL (CORS o xarxa).', err);
-                        });
+                    potentialUrl = currentUrl.href;
                 }
+            } else {
+                // CAS B: Injecció de Prefix (ex: /hola -> /ca/hola)
+                // Això passa quan la URL base no té codi d'idioma (sol ser l'idioma per defecte)
+                // Evitem bucles infinits: si el primer segment ja és l'idioma preferit, no fem res.
+                if (pathSegments[1] !== simplePreferred) {
+                    const newPathSegments = ['', simplePreferred, ...pathSegments.slice(1)];
+                    currentUrl.pathname = newPathSegments.join('/');
+                    potentialUrl = currentUrl.href;
+                }
+            }
+
+            if (potentialUrl) {
+                console.log('Auto Language Redirector: URL deduïda (' + (langIndex !== -1 ? 'reemplaçament' : 'injecció') + '): ' + potentialUrl + '. Verificant existència...');
+                
+                // Verifiquem si la URL existeix abans de redirigir (HEAD request)
+                fetch(potentialUrl, { method: 'HEAD' })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`Auto Language Redirector: URL verificada (${response.status}). Redirigint...`);
+                            window.location.href = potentialUrl;
+                        } else {
+                            console.log(`Auto Language Redirector: La URL deduïda no existeix (${response.status}). S'avorta la redirecció.`);
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Auto Language Redirector: Error verificant URL (CORS o xarxa).', err);
+                    });
             }
         } catch (e) {
             console.error("Error intentant deduir la URL:", e);
