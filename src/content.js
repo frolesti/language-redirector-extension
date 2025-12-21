@@ -80,13 +80,19 @@ function checkAndRedirect() {
                 console.log('Auto Language Redirector: URL deduïda (' + (langIndex !== -1 ? 'reemplaçament' : 'injecció') + '): ' + potentialUrl + '. Verificant existència...');
                 
                 // Verifiquem si la URL existeix abans de redirigir (HEAD request)
-                fetch(potentialUrl, { method: 'HEAD' })
+                // IMPORTANT: Comprovem que no sigui una redirecció (3xx) que ens torni a la pàgina original
+                fetch(potentialUrl, { method: 'HEAD', redirect: 'manual' })
                     .then(response => {
-                        if (response.ok) {
+                        // Si rebem un 200 OK, és perfecte.
+                        // Si rebem un 301/302 (type 'opaqueredirect' o status 3xx), vol dir que la URL redirigeix.
+                        // En aquest cas, NO hem de redirigir nosaltres, perquè podríem causar un bucle.
+                        if (response.ok && response.status === 200) {
                             console.log(`Auto Language Redirector: URL verificada (${response.status}). Redirigint...`);
                             window.location.href = potentialUrl;
+                        } else if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
+                             console.log(`Auto Language Redirector: La URL deduïda redirigeix (${response.status} / ${response.type}). Evitem bucle infinit.`);
                         } else {
-                            console.log(`Auto Language Redirector: La URL deduïda no existeix (${response.status}). S'avorta la redirecció.`);
+                            console.log(`Auto Language Redirector: La URL deduïda no existeix o no és vàlida (${response.status}). S'avorta la redirecció.`);
                         }
                     })
                     .catch(err => {
