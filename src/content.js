@@ -80,29 +80,51 @@ function checkAndRedirect() {
             let potentialUrl = null;
 
             if (langIndex !== -1) {
-                // CAS A: Reemplaçament (ex: /es/hola -> /ca/hola)
+                // CAS A: Reemplaçament de segment complet (ex: /es/hola -> /ca/hola)
                 pathSegments[langIndex] = simplePreferred;
                 currentUrl.pathname = pathSegments.join('/');
                 if (currentUrl.href !== window.location.href) {
                     potentialUrl = currentUrl.href;
                 }
-            } 
-            // else {
-            //    // CAS B: Injecció de Prefix (ex: /hola -> /ca/hola)
-            //    // DESACTIVAT: Aquesta estratègia és massa agressiva i trenca llocs com YouTube (ex: youtube.com/watch -> youtube.com/ca/watch).
-            //    // Només farem servir reemplaçament si detectem un codi d'idioma existent a la URL.
-            //    
-            //    /*
-            //    if (pathSegments[1] !== simplePreferred) {
-            //        const newPathSegments = ['', simplePreferred, ...pathSegments.slice(1)];
-            //        currentUrl.pathname = newPathSegments.join('/');
-            //        potentialUrl = currentUrl.href;
-            //    }
-            //    */
-            // }
+            } else {
+                // CAS A.2: Reemplaçament dins del nom del fitxer (ex: index.es.html -> index.ca.html)
+                // Això és típic de Booking.com i altres llocs estàtics.
+                const newSegments = [...pathSegments];
+                let changed = false;
+                
+                newSegments.forEach((segment, index) => {
+                     // Busquem el patró .idioma. (ex: .es.)
+                     if (simpleCurrent && segment.includes(`.${simpleCurrent}.`)) {
+                         const newSegment = segment.replace(`.${simpleCurrent}.`, `.${simplePreferred}.`);
+                         if (newSegment !== segment) {
+                             newSegments[index] = newSegment;
+                             changed = true;
+                         }
+                     }
+                });
+
+                if (changed) {
+                    currentUrl.pathname = newSegments.join('/');
+                    if (currentUrl.href !== window.location.href) {
+                        potentialUrl = currentUrl.href;
+                    }
+                }
+
+                // CAS B: Injecció de Prefix (ex: /hola -> /ca/hola)
+                // DESACTIVAT: Aquesta estratègia és massa agressiva i trenca llocs com YouTube (ex: youtube.com/watch -> youtube.com/ca/watch).
+                // Només farem servir reemplaçament si detectem un codi d'idioma existent a la URL.
+                
+                /*
+                if (!potentialUrl && pathSegments[1] !== simplePreferred) {
+                    const newPathSegments = ['', simplePreferred, ...pathSegments.slice(1)];
+                    currentUrl.pathname = newPathSegments.join('/');
+                    potentialUrl = currentUrl.href;
+                }
+                */
+            }
 
             if (potentialUrl) {
-                // console.log('Auto Language Redirector: URL deduïda (' + (langIndex !== -1 ? 'reemplaçament' : 'injecció') + '): ' + potentialUrl + '. Verificant existència...');
+                console.log('Auto Language Redirector: URL deduïda: ' + potentialUrl + '. Verificant existència...');
                 
                 // Verifiquem si la URL existeix abans de redirigir (HEAD request)
                 // IMPORTANT: Comprovem que no sigui una redirecció (3xx) que ens torni a la pàgina original
@@ -112,16 +134,16 @@ function checkAndRedirect() {
                         // Si rebem un 301/302 (type 'opaqueredirect' o status 3xx), vol dir que la URL redirigeix.
                         // En aquest cas, NO hem de redirigir nosaltres, perquè podríem causar un bucle.
                         if (response.ok && response.status === 200) {
-                            // console.log(`Auto Language Redirector: URL verificada (${response.status}). Redirigint...`);
+                            console.log(`Auto Language Redirector: URL verificada (${response.status}). Redirigint...`);
                             window.location.href = potentialUrl;
                         } else if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-                             // console.log(`Auto Language Redirector: La URL deduïda redirigeix (${response.status} / ${response.type}). Evitem bucle infinit.`);
+                             console.log(`Auto Language Redirector: La URL deduïda redirigeix (${response.status} / ${response.type}). Evitem bucle infinit.`);
                         } else {
-                            // console.log(`Auto Language Redirector: La URL deduïda no existeix o no és vàlida (${response.status}). S'avorta la redirecció.`);
+                            console.log(`Auto Language Redirector: La URL deduïda no existeix o no és vàlida (${response.status}). S'avorta la redirecció.`);
                         }
                     })
                     .catch(err => {
-                        // console.log('Auto Language Redirector: Error verificant URL (CORS o xarxa).', err);
+                        console.log('Auto Language Redirector: Error verificant URL (CORS o xarxa).', err);
                     });
             }
         } catch (e) {
