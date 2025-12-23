@@ -43,6 +43,20 @@ function checkAndRedirect() {
         });
     }
 
+    // 1.5. Estratègia d'Enllaços Hreflang (Fallback)
+    // Si no hi ha tags <link> al head, busquem enllaços <a> amb atribut hreflang al cos (ex: euskadi.eus).
+    if (!targetUrl) {
+        const anchorAlternates = document.querySelectorAll('a[hreflang]');
+        if (anchorAlternates.length > 0) {
+             anchorAlternates.forEach(link => {
+                const hreflang = link.getAttribute('hreflang').toLowerCase();
+                if (hreflang === preferredLang.toLowerCase() || hreflang.startsWith(preferredLang.toLowerCase() + '-')) {
+                    targetUrl = link.href;
+                }
+            });
+        }
+    }
+
     // 2. Estratègia de Widgets JS (ex: Google Language Translator)
     // Alguns llocs (WordPress) fan servir plugins que no canvien la URL però usen cookies/JS.
     // Busquem elements amb classes típiques de plugins de traducció (ex: .nturl.ca)
