@@ -1,15 +1,16 @@
 ﻿// src/content.js
 
 function checkAndRedirect(attempt = 1) {
-  // Recuperem l'idioma preferit i l'estat d'activació
-  chrome.storage.sync.get(['preferredLanguage', 'isEnabled'], function(result) {
+  // Recuperem l'estat d'activació (l'idioma és fix per extensió)
+  chrome.storage.sync.get(['isEnabled'], function(result) {
     // Si està desactivat explícitament, no fem res
     if (result.isEnabled === false) {
         console.log('Auto Language Redirector: Extensió desactivada per l\'usuari.');
         return;
     }
 
-    const preferredLang = result.preferredLanguage || 'ca';
+    // L'idioma ve definit pel build (hardcoded per a cada versió de l'extensió)
+    const preferredLang = 'eu';
     console.log(`Auto Language Redirector (Attempt ${attempt}): Preferred=${preferredLang}`);
 
     // Obtenim l'idioma actual de la pàgina (atribut lang del tag html)
@@ -196,3 +197,4 @@ function checkAndRedirect(attempt = 1) {
 
 // Executem la comprovació
 checkAndRedirect();
+

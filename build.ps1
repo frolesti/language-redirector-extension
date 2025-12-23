@@ -20,7 +20,7 @@ function Update-Icon {
 
     $img = [System.Drawing.Image]::FromFile($SourcePath)
     $canvasSize = 128
-    $iconSize = 145 # Zoom in slightly (larger than canvas) to maximize the content size, cropping margins if necessary
+    $iconSize = 128 # Use exact size to avoid cropping or blurring, as we now use 128px source icons
 
     # Calculate scaling
     $ratioX = $iconSize / $img.Width
@@ -37,20 +37,14 @@ function Update-Icon {
     $g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
     $g.Clear([System.Drawing.Color]::Transparent)
 
-    # Use ImageAttributes to set a color key range for transparency
-    # This handles "near white" backgrounds better than MakeTransparent
-    $ia = New-Object System.Drawing.Imaging.ImageAttributes
-    $ia.SetColorKey([System.Drawing.Color]::FromArgb(230, 230, 230), [System.Drawing.Color]::White)
-
     $posX = [int](($canvasSize - $newWidth) / 2)
     $posY = [int](($canvasSize - $newHeight) / 2)
 
     $destRect = New-Object System.Drawing.Rectangle($posX, $posY, $newWidth, $newHeight)
-    $g.DrawImage($img, $destRect, 0, 0, $img.Width, $img.Height, [System.Drawing.GraphicsUnit]::Pixel, $ia)
+    $g.DrawImage($img, $destRect, 0, 0, $img.Width, $img.Height, [System.Drawing.GraphicsUnit]::Pixel)
     
     $bmp.Save($DestPath, [System.Drawing.Imaging.ImageFormat]::Png)
 
-    $ia.Dispose()
     $img.Dispose()
     $g.Dispose()
     $bmp.Dispose()
