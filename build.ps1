@@ -20,7 +20,7 @@ function Update-Icon {
 
     $img = [System.Drawing.Image]::FromFile($SourcePath)
     $canvasSize = 128
-    $iconSize = 128 # Full size to maximize visibility in toolbar
+    $iconSize = 145 # Zoom in slightly (larger than canvas) to maximize the content size, cropping margins if necessary
 
     # Calculate scaling
     $ratioX = $iconSize / $img.Width
@@ -31,29 +31,26 @@ function Update-Icon {
     $newHeight = [int]($img.Height * $ratio)
 
     $bmp = New-Object System.Drawing.Bitmap($canvasSize, $canvasSize)
-    # Make white transparent on the new bitmap if we were drawing directly, 
-    # but we need to process the source image or draw it then make transparent.
-    # Better approach: Make the source image transparent if it has white background.
-    # Note: This is a simple color key. It might affect white parts inside the logo.
-    # Given the request "remove white background", we'll try this.
-    
-    # Create a temporary bitmap to process transparency
-    $tempBmp = New-Object System.Drawing.Bitmap($img)
-    $tempBmp.MakeTransparent([System.Drawing.Color]::White)
-
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
     $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
     $g.PixelOffsetMode = [System.Drawing.Drawing2D.PixelOffsetMode]::HighQuality
     $g.Clear([System.Drawing.Color]::Transparent)
 
-    $posX = ($canvasSize - $newWidth) / 2
-    $posY = ($canvasSize - $newHeight) / 2
+    # Use ImageAttributes to set a color key range for transparency
+    # This handles "near white" backgrounds better than MakeTransparent
+    $ia = New-Object System.Drawing.Imaging.ImageAttributes
+    $ia.SetColorKey([System.Drawing.Color]::FromArgb(230, 230, 230), [System.Drawing.Color]::White)
 
-    $g.DrawImage($tempBmp, $posX, $posY, $newWidth, $newHeight)
+    $posX = [int](($canvasSize - $newWidth) / 2)
+    $posY = [int](($canvasSize - $newHeight) / 2)
+
+    $destRect = New-Object System.Drawing.Rectangle($posX, $posY, $newWidth, $newHeight)
+    $g.DrawImage($img, $destRect, 0, 0, $img.Width, $img.Height, [System.Drawing.GraphicsUnit]::Pixel, $ia)
+    
     $bmp.Save($DestPath, [System.Drawing.Imaging.ImageFormat]::Png)
 
-    $tempBmp.Dispose()
+    $ia.Dispose()
     $img.Dispose()
     $g.Dispose()
     $bmp.Dispose()
