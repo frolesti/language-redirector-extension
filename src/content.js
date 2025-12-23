@@ -1,6 +1,6 @@
 ﻿// src/content.js
 
-function checkAndRedirect() {
+function checkAndRedirect(attempt = 1) {
   // Recuperem l'idioma preferit i l'estat d'activació
   chrome.storage.sync.get(['preferredLanguage', 'isEnabled'], function(result) {
     // Si està desactivat explícitament, no fem res
@@ -10,8 +10,7 @@ function checkAndRedirect() {
     }
 
     const preferredLang = result.preferredLanguage || 'ca';
-    
-    // console.log('Auto Language Redirector: Idioma preferit és', preferredLang);
+    console.log(`Auto Language Redirector (Attempt ${attempt}): Preferred=${preferredLang}`);
 
     // Obtenim l'idioma actual de la pàgina (atribut lang del tag html)
     const currentLang = document.documentElement.lang || '';
@@ -22,40 +21,59 @@ function checkAndRedirect() {
 
     // Si ja estem en l'idioma preferit, no fem res.
     if (simpleCurrent === simplePreferred) {
+        console.log('Auto Language Redirector: Already in preferred language.');
         return;
     }
 
     let targetUrl = null;
 
-    // 1. Estratègia Hreflang (Mètode estàndard i més fiable)
-    // Busquem els tags <link rel="alternate" hreflang="...">
-    const alternates = document.querySelectorAll('link[rel="alternate"][hreflang]');
-    
-    if (alternates.length > 0) {
-        // Iterem per trobar si hi ha una versió en el nostre idioma
+    // Helper function to find target URL
+    function findTargetUrl() {
+        let url = null;
+        
+        // 1. Strategy Hreflang (Head)
+        const alternates = document.querySelectorAll('link[rel="alternate"][hreflang]');
         alternates.forEach(link => {
             const hreflang = link.getAttribute('hreflang').toLowerCase();
-            
-            // Comprovem si el hreflang coincideix amb la preferència
             if (hreflang === preferredLang.toLowerCase() || hreflang.startsWith(preferredLang.toLowerCase() + '-')) {
-                targetUrl = link.href;
+                url = link.href;
             }
         });
+
+        if (url) return url;
+
+        // 1.5. Strategy Anchor Hreflang (Body)
+        const anchorAlternates = document.querySelectorAll('a[hreflang]');
+        anchorAlternates.forEach(link => {
+            const hreflang = link.getAttribute('hreflang').toLowerCase();
+            if (hreflang === preferredLang.toLowerCase() || hreflang.startsWith(preferredLang.toLowerCase() + '-')) {
+                url = link.href;
+            }
+        });
+        
+        if (url) return url;
+        
+        // 1.6. Strategy Anchor Lang (Body) - Restricted
+        // Only if text content matches language code or name, or class indicates language switcher
+        const langAnchors = document.querySelectorAll('a[lang]');
+        langAnchors.forEach(link => {
+             const langAttr = link.getAttribute('lang').toLowerCase();
+             if (langAttr === preferredLang.toLowerCase() || langAttr.startsWith(preferredLang.toLowerCase() + '-')) {
+                 // Check if it looks like a switcher
+                 const text = link.textContent.trim().toLowerCase();
+                 // Common language names and codes
+                 const validTexts = ['eu', 'es', 'en', 'ca', 'gl', 'euskara', 'español', 'english', 'català', 'galego', 'eus', 'cat', 'gal'];
+                 
+                 if (validTexts.includes(text) || link.className.toLowerCase().includes('lang') || link.className.toLowerCase().includes('switcher')) {
+                     url = link.href;
+                 }
+             }
+        });
+
+        return url;
     }
 
-    // 1.5. Estratègia d'Enllaços Hreflang (Fallback)
-    // Si no hi ha tags <link> al head, busquem enllaços <a> amb atribut hreflang al cos (ex: euskadi.eus).
-    if (!targetUrl) {
-        const anchorAlternates = document.querySelectorAll('a[hreflang]');
-        if (anchorAlternates.length > 0) {
-             anchorAlternates.forEach(link => {
-                const hreflang = link.getAttribute('hreflang').toLowerCase();
-                if (hreflang === preferredLang.toLowerCase() || hreflang.startsWith(preferredLang.toLowerCase() + '-')) {
-                    targetUrl = link.href;
-                }
-            });
-        }
-    }
+    targetUrl = findTargetUrl();
 
     // 2. Estratègia de Widgets JS (ex: Google Language Translator)
     // Alguns llocs (WordPress) fan servir plugins que no canvien la URL però usen cookies/JS.
@@ -71,7 +89,7 @@ function checkAndRedirect() {
             const isTranslated = cookies.includes('googtrans=') && cookies.includes(`/${simplePreferred}`);
 
             if (!isTranslated) {
-                // console.log('Auto Language Redirector: Widget de traducció detectat. Activant...');
+                console.log('Auto Language Redirector: Widget detected. Clicking...');
                 widgetLink.click();
                 return; // Sortim, ja que el click hauria de gestionar el canvi
             }
@@ -138,7 +156,7 @@ function checkAndRedirect() {
             }
 
             if (potentialUrl) {
-                console.log('Auto Language Redirector: URL deduïda: ' + potentialUrl + '. Verificant existència...');
+                console.log('Auto Language Redirector: Deduced URL: ' + potentialUrl);
                 
                 // Verifiquem si la URL existeix abans de redirigir (HEAD request)
                 // IMPORTANT: Comprovem que no sigui una redirecció (3xx) que ens torni a la pàgina original
@@ -148,23 +166,29 @@ function checkAndRedirect() {
                         // Si rebem un 301/302 (type 'opaqueredirect' o status 3xx), vol dir que la URL redirigeix.
                         // En aquest cas, NO hem de redirigir nosaltres, perquè podríem causar un bucle.
                         if (response.ok && response.status === 200) {
-                            console.log(`Auto Language Redirector: URL verificada (${response.status}). Redirigint...`);
+                            console.log(`Auto Language Redirector: URL verified (${response.status}). Redirecting...`);
                             window.location.href = potentialUrl;
                         } else if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-                             console.log(`Auto Language Redirector: La URL deduïda redirigeix (${response.status} / ${response.type}). Evitem bucle infinit.`);
+                             console.log(`Auto Language Redirector: URL redirects (${response.status}). Avoiding loop.`);
                         } else {
-                            console.log(`Auto Language Redirector: La URL deduïda no existeix o no és vàlida (${response.status}). S'avorta la redirecció.`);
+                            console.log(`Auto Language Redirector: URL invalid (${response.status}).`);
                         }
                     })
                     .catch(err => {
-                        console.log('Auto Language Redirector: Error verificant URL (CORS o xarxa).', err);
+                        console.log('Auto Language Redirector: Error verifying URL.', err);
                     });
+            } else {
+                // Retry logic if no URL found and attempts < 3
+                if (attempt < 3) {
+                    console.log(`Auto Language Redirector: No target found. Retrying in 1s (Attempt ${attempt + 1})...`);
+                    setTimeout(() => checkAndRedirect(attempt + 1), 1000);
+                }
             }
         } catch (e) {
-            console.error("Error intentant deduir la URL:", e);
+            console.error("Error deducing URL:", e);
         }
     } else if (targetUrl && targetUrl !== window.location.href) {
-      // console.log('Auto Language Redirector: Pàgina detectada per hreflang en ' + preferredLang + '. Redirigint...');
+      console.log('Auto Language Redirector: Target found via hreflang/lang. Redirecting to ' + targetUrl);
       window.location.href = targetUrl;
     }
   });
