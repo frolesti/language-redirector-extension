@@ -20,7 +20,7 @@ function Update-Icon {
 
     $img = [System.Drawing.Image]::FromFile($SourcePath)
     $canvasSize = 128
-    $iconSize = 96 # Set to 96 to leave 16px padding as per Chrome Web Store requirements
+    $iconSize = 128 # Full size to maximize visibility in toolbar
 
     # Calculate scaling
     $ratioX = $iconSize / $img.Width
