@@ -83,6 +83,11 @@ foreach ($lang in $languages) {
     $popupJs = $popupJs.Replace("{{DISABLE_TEXT}}", $cfg.disableText)
     Set-Content -Path "src/popup/popup.js" -Value $popupJs -Encoding UTF8
 
+    # Process Content JS
+    $contentJs = Get-Content -Raw -Path "src/content.template.js" -Encoding UTF8
+    $contentJs = $contentJs.Replace("{{PREFERRED_LANGUAGE}}", $cfg.preferredLanguage)
+    Set-Content -Path "src/content.js" -Value $contentJs -Encoding UTF8
+
     # Update Icon
     if (-not (Test-Path "icons")) {
         New-Item -ItemType Directory -Path "icons" -Force | Out-Null
