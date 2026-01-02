@@ -10,7 +10,8 @@ Add-Type -AssemblyName System.Drawing
 function Update-Icon {
     param (
         [string]$SourcePath,
-        [string]$DestPath
+        [string]$DestPath,
+        [switch]$Grayscale
     )
     
     if (-not (Test-Path $SourcePath)) {
@@ -41,7 +42,26 @@ function Update-Icon {
     $posY = [int](($canvasSize - $newHeight) / 2)
 
     $destRect = New-Object System.Drawing.Rectangle($posX, $posY, $newWidth, $newHeight)
-    $g.DrawImage($img, $destRect, 0, 0, $img.Width, $img.Height, [System.Drawing.GraphicsUnit]::Pixel)
+    
+    if ($Grayscale) {
+        $matrix = New-Object System.Drawing.Imaging.ColorMatrix
+        $matrix.Matrix00 = 0.30
+        $matrix.Matrix01 = 0.30
+        $matrix.Matrix02 = 0.30
+        $matrix.Matrix10 = 0.59
+        $matrix.Matrix11 = 0.59
+        $matrix.Matrix12 = 0.59
+        $matrix.Matrix20 = 0.11
+        $matrix.Matrix21 = 0.11
+        $matrix.Matrix22 = 0.11
+        
+        $attributes = New-Object System.Drawing.Imaging.ImageAttributes
+        $attributes.SetColorMatrix($matrix)
+        
+        $g.DrawImage($img, $destRect, 0, 0, $img.Width, $img.Height, [System.Drawing.GraphicsUnit]::Pixel, $attributes)
+    } else {
+        $g.DrawImage($img, $destRect, 0, 0, $img.Width, $img.Height, [System.Drawing.GraphicsUnit]::Pixel)
+    }
     
     $bmp.Save($DestPath, [System.Drawing.Imaging.ImageFormat]::Png)
 
@@ -92,6 +112,7 @@ foreach ($lang in $languages) {
         Write-Warning "Icon source $iconSource not found for $lang"
     } else {
         Update-Icon -SourcePath $iconSource -DestPath "icons/logo.png"
+        Update-Icon -SourcePath $iconSource -DestPath "icons/logo_disabled.png" -Grayscale
     }
 
     # Zip

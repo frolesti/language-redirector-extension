@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
           const newState = toggle.checked;
           chrome.storage.sync.set({ isEnabled: newState });
           updateLabel(newState);
+          
+          // Update icon immediately
+          const iconPath = newState ? "/icons/logo.png" : "/icons/logo_disabled.png";
+          chrome.action.setIcon({ path: iconPath });
       });
 
       function updateLabel(state) {
