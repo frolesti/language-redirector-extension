@@ -19,7 +19,35 @@ function Update-Icon {
         return
     }
 
-    $img = [System.Drawing.Image]::FromFile($SourcePath)
+    $originalImg = [System.Drawing.Bitmap]::FromFile($SourcePath)
+    
+    # Trim transparency manually (GetPixel is slow but works without unsafe code)
+    $minX = $originalImg.Width
+    $minY = $originalImg.Height
+    $maxX = -1
+    $maxY = -1
+    
+    for ($y = 0; $y -lt $originalImg.Height; $y++) {
+        for ($x = 0; $x -lt $originalImg.Width; $x++) {
+            if ($originalImg.GetPixel($x, $y).A -gt 0) {
+                if ($x -lt $minX) { $minX = $x }
+                if ($x -gt $maxX) { $maxX = $x }
+                if ($y -lt $minY) { $minY = $y }
+                if ($y -gt $maxY) { $maxY = $y }
+            }
+        }
+    }
+    
+    if ($maxX -ne -1) {
+        $w = $maxX - $minX + 1
+        $h = $maxY - $minY + 1
+        $rect = New-Object System.Drawing.Rectangle($minX, $minY, $w, $h)
+        $img = $originalImg.Clone($rect, $originalImg.PixelFormat)
+        $originalImg.Dispose()
+    } else {
+        $img = $originalImg
+    }
+
     $canvasSize = 128
     $iconSize = 128 # Use exact size to avoid cropping or blurring, as we now use 128px source icons
 
@@ -87,6 +115,7 @@ foreach ($lang in $languages) {
     $popupHtml = $popupHtml.Replace("{{DONATE_TEXT}}", $cfg.donateText)
     $popupHtml = $popupHtml.Replace("{{REPORT_TEXT}}", $cfg.reportText)
     $popupHtml = $popupHtml.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
+    $popupHtml = $popupHtml.Replace("{{LANG_CODE}}", $lang)
     Set-Content -Path "src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 
     # Process Popup JS
@@ -100,6 +129,7 @@ foreach ($lang in $languages) {
     # Process Content JS
     $contentJs = Get-Content -Raw -Path "src/content.template.js" -Encoding UTF8
     $contentJs = $contentJs.Replace("{{PREFERRED_LANGUAGE}}", $cfg.preferredLanguage)
+    $contentJs = $contentJs.Replace("{{NAME}}", $cfg.name)
     Set-Content -Path "src/content.js" -Value $contentJs -Encoding UTF8
 
     # Update Icon
@@ -120,4 +150,11 @@ foreach ($lang in $languages) {
     if (Test-Path $zipName) { Remove-Item $zipName }
     Compress-Archive -Path manifest.json, src, icons -DestinationPath $zipName -Force
     Write-Host "Created $zipName"
+
+    # Update manifest for local development (add DEV suffix)
+    # This ensures that when loading "unpacked", we see a different name than the installed store version
+    $manifestDev = Get-Content -Raw -Path "manifest.template.json" -Encoding UTF8
+    $manifestDev = $manifestDev.Replace("{{NAME}}", "$($cfg.name) (DEV)")
+    $manifestDev = $manifestDev.Replace("{{DESCRIPTION}}", $cfg.description)
+    Set-Content -Path "manifest.json" -Value $manifestDev -Encoding UTF8
 }
