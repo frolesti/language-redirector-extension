@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const textEnabled = "{{ENABLE_TEXT}}";
           const textDisabled = "{{DISABLE_TEXT}}";
           label.textContent = state ? textEnabled : textDisabled;
-          label.style.color = state ? '#2196F3' : '#777';
+          label.style.color = state ? '#D81E05' : '#777';
       }
   });
 
