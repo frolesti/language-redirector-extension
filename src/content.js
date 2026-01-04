@@ -9,6 +9,56 @@ function checkAndRedirect(attempt = 1) {
         return;
     }
 
+    // --- SAFETY CHECK: LOOP DETECTION ---
+    const MAX_REDIRECTS = 3;
+    const TIME_WINDOW = 10000; // 10 seconds
+    const STORAGE_KEY_COUNT = 'alr_redirect_count';
+    const STORAGE_KEY_TIME = 'alr_last_redirect_time';
+
+    const now = Date.now();
+    let redirectCount = parseInt(sessionStorage.getItem(STORAGE_KEY_COUNT) || '0');
+    const lastRedirectTime = parseInt(sessionStorage.getItem(STORAGE_KEY_TIME) || '0');
+
+    // Reset count if time window passed
+    if (now - lastRedirectTime > TIME_WINDOW) {
+        redirectCount = 0;
+        sessionStorage.setItem(STORAGE_KEY_COUNT, '0');
+    }
+
+    if (redirectCount >= MAX_REDIRECTS) {
+        console.log('Auto Language Redirector: Too many redirects detected. Pausing for safety.');
+        
+        // Show UI Warning
+        const warningDiv = document.createElement('div');
+        warningDiv.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 999999;
+            font-family: sans-serif;
+            font-size: 14px;
+            max-width: 300px;
+        `;
+        warningDiv.innerHTML = `
+            <strong>⚠️ Euskaraz Mesedez</strong><br>
+            S'han detectat massa redireccions.<br>
+            L'extensió s'ha aturat temporalment en aquesta pàgina per evitar problemes.<br>
+            <button style="margin-top:10px; float:right; cursor:pointer; background:transparent; border:none; color:#856404; font-weight:bold;">✕ Tancar</button>
+        `;
+        
+        warningDiv.querySelector('button').onclick = () => warningDiv.remove();
+        document.body.appendChild(warningDiv);
+        
+        return;
+    }
+    // ------------------------------------
+
     // L'idioma ve definit pel build (hardcoded per a cada versió de l'extensió)
     const preferredLang = 'eu';
     console.log(`Auto Language Redirector (Attempt ${attempt}): Preferred=${preferredLang}`);
@@ -41,7 +91,12 @@ function checkAndRedirect(attempt = 1) {
             }
         });
 
-        if (url) return url;
+        if (url) {
+            // Increment redirect count before redirecting
+            sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+            sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+            return url;
+        }
 
         // 1.5. Strategy Anchor Hreflang (Body)
         const anchorAlternates = document.querySelectorAll('a[hreflang]');
@@ -52,7 +107,12 @@ function checkAndRedirect(attempt = 1) {
             }
         });
         
-        if (url) return url;
+        if (url) {
+            // Increment redirect count before redirecting
+            sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+            sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+            return url;
+        }
         
         // 1.6. Strategy Anchor Lang (Body) - Restricted
         // Only if text content matches language code or name, or class indicates language switcher
@@ -91,6 +151,10 @@ function checkAndRedirect(attempt = 1) {
 
             if (!isTranslated) {
                 console.log('Auto Language Redirector: Widget detected. Clicking...');
+                // Increment redirect count before clicking widget (which causes reload/redirect)
+                sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+                sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+                
                 widgetLink.click();
                 return; // Sortim, ja que el click hauria de gestionar el canvi
             }
@@ -168,6 +232,10 @@ function checkAndRedirect(attempt = 1) {
                         // En aquest cas, NO hem de redirigir nosaltres, perquè podríem causar un bucle.
                         if (response.ok && response.status === 200) {
                             console.log(`Auto Language Redirector: URL verified (${response.status}). Redirecting...`);
+                            // Increment redirect count before redirecting
+                            sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+                            sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+                            
                             window.location.href = potentialUrl;
                         } else if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
                              console.log(`Auto Language Redirector: URL redirects (${response.status}). Avoiding loop.`);
