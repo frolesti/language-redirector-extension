@@ -243,11 +243,66 @@ function checkAndRedirect(attempt = 1) {
     if (!targetUrl) {
         // EXCEPTION: Domains known to interpret '/ca/' as Canada (ISO 3166) instead of Catalan (ISO 639)
         // These sites have English/French content at /ca/ and should NOT be redirected to automatically if the user wants Catalan.
-        const FALSE_FRIENDS_CA = ['filmaffinity.com', 'adobe.com', 'hp.com', 'dell.com', 'apple.com', 'microsoft.com', 'amazon.com', 'nike.com'];
+        const FALSE_FRIENDS_CA = ['filmaffinity.com', 'adobe.com', 'hp.com', 'dell.com', 'apple.com', 'microsoft.com', 'amazon.com', 'nike.com', 'mango.com'];
         const isFalseFriend = simplePreferred === 'ca' && FALSE_FRIENDS_CA.some(domain => window.location.hostname.includes(domain));
 
         if (isFalseFriend) {
-             console.log('Auto Language Redirector: Domain is a False Friend (uses /ca/ for Canada). Skipping deduction.');
+             console.log('Auto Language Redirector: Domain is a False Friend (uses /ca/ for Canada). Attempting Generalized Nested Strategy...');
+             
+             let nestedUrl = null;
+             const currentPath = window.location.pathname;
+             
+             // GENERALIZED NESTED STRATEGY (e.g. /es/ -> /es/ca/)
+             // Pattern: /{region_or_lang}/{lang}/ 
+             // We look for the current path starting with a known major language code (es, en, fr)
+             
+             const pathParts = currentPath.split('/'); 
+             const firstSegment = pathParts[1] ? pathParts[1].toLowerCase() : '';
+             
+             // If first segment is a 2-letter code AND not our target (e.g. 'es')
+             if (firstSegment && firstSegment.length === 2 && firstSegment !== simplePreferred) {
+                 const secondSegment = pathParts[2] ? pathParts[2].toLowerCase() : '';
+                 
+                 // If the second segment is SAME as first (e.g. /es/es like Mango), or just plain /es/...
+                 // We want to inject 'ca' as the second segment.
+                 // Case 1: /es/es -> we want /es/ca. (Replace second segment)
+                 // Case 2: /es/any -> we want /es/ca/any. (Insert segment)
+                 
+                 const newParts = [...pathParts];
+                 
+                 if (secondSegment === firstSegment) {
+                     // Mango style: /es/es -> /es/ca
+                     newParts[2] = simplePreferred;
+                 } else if (secondSegment !== simplePreferred) {
+                     // Nike style: /es/products -> /es/ca/products
+                     newParts.splice(2, 0, simplePreferred);
+                 }
+                 
+                 const newPath = newParts.join('/');
+                 if (newPath !== currentPath) {
+                    const u = new URL(window.location.href);
+                    u.pathname = newPath;
+                    nestedUrl = u.href;
+                    console.log(`Auto Language Redirector: Generalized Nested Strategy proposed: ${nestedUrl}`);
+                 }
+             }
+
+             if (nestedUrl) {
+                 // Verify URL before redirecting
+                 fetch(nestedUrl, { method: 'HEAD', redirect: 'manual' })
+                    .then(response => {
+                        if (response.ok && response.status === 200) {
+                             console.log(`Auto Language Redirector: Nested URL verified. Redirecting...`);
+                             sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+                             sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+                             window.location.href = nestedUrl;
+                        } else {
+                             console.log('Auto Language Redirector: Nested URL invalid or redirecting. Skipping.');
+                        }
+                    }).catch(e => console.log('Verification failed', e));
+             } else {
+                console.log('Auto Language Redirector: No valid generalized nested path found for False Friend.');
+             }
         } else {
             try {
                 const currentUrl = new URL(window.location.href);
