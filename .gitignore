@@ -3,8 +3,10 @@ node_modules
 *.log
 
 # Generated files (Build artifacts)
+build/
 *.zip
 manifest.json
+src/content.js
 src/popup/popup.html
 src/popup/popup.js
 icons/
