@@ -73,12 +73,6 @@ L'extensió ve llesta per utilitzar. Si la vols aturar temporalment, només has 
 Si t'agrada aquesta eina i vols donar suport al seu desenvolupament, pots fer-ho a través del meu perfil a **l'Aixeta**:
 👉 [https://frolesti.aixeta.cat/](https://frolesti.aixeta.cat/)
 
-### Solució de problemes comuns
-
-*   **Firefox:** Fes servir la versió específica de Firefox dins de `build/`, ja que utilitza una versió de manifest diferent.
-*   **Massa redireccions:** Si l'extensió detecta un bucle, s'aturarà automàticament i t'avisarà.
-
----
 
 ## 🌍 Estructura del Projecte
 

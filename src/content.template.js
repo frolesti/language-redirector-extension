@@ -403,6 +403,35 @@ function checkAndRedirect(attempt = 1) {
                         } else {
                             console.log(`Auto Language Redirector: URL invalid (${response.status}).`);
                             
+                            // START STRATEGY: REMOVE LANGUAGE SEGMENT (Root Fallback)
+                            // Valid for sites where Root is default Lang (e.g. irta.cat: /es/ -> / )
+                            if (langIndex !== -1) {
+                                try {
+                                    const rawUrl = new URL(window.location.href);
+                                    const rawSegments = rawUrl.pathname.split('/');
+                                    
+                                    // Ensure we are removing the correct segment
+                                    if (rawSegments.length > langIndex) {
+                                         rawSegments.splice(langIndex, 1);
+                                         rawUrl.pathname = rawSegments.join('/');
+                                         const removalUrl = rawUrl.href;
+                                         
+                                         if (removalUrl !== window.location.href) {
+                                             console.log(`Auto Language Redirector: Attempting Removal Strategy: ${removalUrl}`);
+                                             fetch(removalUrl, { method: 'HEAD', redirect: 'manual' })
+                                                .then(res2 => {
+                                                    if (res2.ok && res2.status === 200) {
+                                                         console.log(`Auto Language Redirector: Removal URL verified. Redirecting...`);
+                                                         sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+                                                         sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+                                                         window.location.href = removalUrl;
+                                                    }
+                                                }).catch(() => {});
+                                         }
+                                    }
+                                } catch (err) { console.error(err); }
+                            }
+
                             // Start GENERALIZED Fallback for News/Broken Sites (Issue 1)
                             // If correct URL is 404, check if Root Hompage exists and warn
                             // ONLY if we haven't found anything else.
