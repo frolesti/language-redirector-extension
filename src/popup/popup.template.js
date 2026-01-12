@@ -27,7 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
           
           // Update icon immediately
           const iconPath = newState ? "/icons/logo.png" : "/icons/logo_disabled.png";
-          chrome.action.setIcon({ path: iconPath });
+          const actionAPI = chrome.action || chrome.browserAction;
+          if (actionAPI) {
+            actionAPI.setIcon({ path: iconPath });
+          }
       });
 
       function updateLabel(state) {

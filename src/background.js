@@ -1,6 +1,9 @@
 function updateIcon(isEnabled) {
   const path = isEnabled ? "/icons/logo.png" : "/icons/logo_disabled.png";
-  chrome.action.setIcon({ path: path });
+  const actionAPI = chrome.action || chrome.browserAction;
+  if (actionAPI) {
+    actionAPI.setIcon({ path: path });
+  }
 }
 
 chrome.runtime.onInstalled.addListener(() => {

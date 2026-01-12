@@ -21,7 +21,11 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "{{NAME}}@extension",
-      "strict_min_version": "109.0"
+      "strict_min_version": "109.0",
+      "data_collection_permissions": {
+        "required": ["none"],
+        "optional": []
+      }
     }
   },
   "content_scripts": [
@@ -30,11 +34,5 @@
       "js": ["src/content.js"],
       "run_at": "document_idle"
     }
-  ],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "encatalasisplau@extension",
-      "strict_min_version": "57.0"
-    }
-  }
+  ]
 }
