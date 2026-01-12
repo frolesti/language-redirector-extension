@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "{{NAME}}",
   "version": "1.4",
   "description": "{{DESCRIPTION}}",
@@ -11,9 +11,9 @@
     "128": "icons/logo.png"
   },
   "background": {
-    "service_worker": "src/background.js"
+    "scripts": ["src/background.js"]
   },
-  "action": {
+  "browser_action": {
     "default_popup": "src/popup/popup.html",
     "default_icon": {
       "48": "icons/logo.png",
@@ -26,5 +26,11 @@
       "js": ["src/content.js"],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "encatalasisplau@extension",
+      "strict_min_version": "57.0"
+    }
+  }
 }
