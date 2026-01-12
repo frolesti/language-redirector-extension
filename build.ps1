@@ -1,6 +1,7 @@
 ﻿param (
     [string]$Language = "all",
-    [string]$Browser = "all"
+    [string]$Browser = "all",
+    [string]$Version = "1.6"
 )
 
 $config = Get-Content -Raw -Path "config.json" -Encoding UTF8 | ConvertFrom-Json
@@ -172,6 +173,7 @@ foreach ($lang in $languages) {
         $manifest = Get-Content -Raw -Path $manifestTemplate -Encoding UTF8
         $manifest = $manifest.Replace("{{NAME}}", $cfg.name)
         $manifest = $manifest.Replace("{{DESCRIPTION}}", $cfg.description)
+        $manifest = $manifest.Replace("{{VERSION}}", $Version)
         Set-Content -Path "$targetDir/manifest.json" -Value $manifest -Encoding UTF8
 
         # Process Popup HTML
