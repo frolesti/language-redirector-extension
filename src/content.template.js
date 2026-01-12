@@ -1,18 +1,26 @@
 // src/content.js
 
 function checkAndRedirect(attempt = 1) {
-  // Recuperem l'estat d'activació (l'idioma és fix per extensió)
-  chrome.storage.local.get(['isEnabled'], function(result) {
+  // Recuperem l'estat d'activació i la llista d'exclusions
+  chrome.storage.local.get(['isEnabled', 'excludedDomains'], function(result) {
     // Gestió d'errors de lectura (defensa contra errors a Firefox)
     if (chrome.runtime.lastError) {
       console.warn('Auto Language Redirector: Error llegint configuració:', chrome.runtime.lastError);
       // Si falla, continuem assumint que està activat
-      result = { isEnabled: true };
+      result = { isEnabled: true, excludedDomains: [] };
     }
     
     // Si result és undefined per algun motiu estrany
     if (!result) {
-      result = { isEnabled: true };
+      result = { isEnabled: true, excludedDomains: [] };
+    }
+
+    // 0. CHECK EXCLUSIONS
+    const hostname = window.location.hostname;
+    const excludedList = result.excludedDomains || [];
+    if (excludedList.includes(hostname)) {
+        console.log(`Auto Language Redirector: Domain ${hostname} is excluded by user. Skipping.`);
+        return;
     }
 
     // Si està desactivat explícitament, no fem res

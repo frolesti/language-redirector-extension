@@ -17,6 +17,15 @@
       <span id="toggleLabel" style="margin-left: 10px; font-weight: bold;">{{ENABLE_TEXT}}</span>
     </div>
 
+    <!-- Exclusion Checkbox -->
+    <div style="margin-bottom: 20px; font-size: 0.9em; color: #555; text-align: left; padding: 0 10px;">
+        <label style="display: flex; align-items: center; cursor: pointer;">
+            <input type="checkbox" id="excludeDomain" style="margin-right: 8px;">
+            <span>{{EXCLUDE_TEXT}}</span>
+        </label>
+        <div id="domainName" style="font-size: 0.8em; color: #888; margin-left: 20px; margin-top: 2px;"></div>
+    </div>
+
     <button id="donate">{{DONATE_TEXT}}</button>
     <button id="report">{{REPORT_TEXT}}</button>
     <p id="status" style="display:none;"></p>

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Forcem l'idioma en instal·lar/obrir (només si no està definit)
-  chrome.storage.local.get(['preferredLanguage', 'isEnabled'], (result) => {
+  // Check both extension state and excluded domains
+  chrome.storage.local.get(['preferredLanguage', 'isEnabled', 'excludedDomains'], (result) => {
       if (chrome.runtime.lastError) {
         console.error('Error storage:', chrome.runtime.lastError);
         result = {}; // Fallback
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
           chrome.storage.local.set({ preferredLanguage: '{{PREFERRED_LANGUAGE}}' });
       }
       
-      // Gestió del toggle
+      // --- MAIN TOGGLE LOGIC ---
       const toggle = document.getElementById('toggleExtension');
       const label = document.getElementById('toggleLabel');
       
@@ -45,6 +45,65 @@ document.addEventListener('DOMContentLoaded', () => {
           label.textContent = state ? textEnabled : textDisabled;
           label.style.color = state ? '#D81E05' : '#777';
       }
+
+      // --- EXCLUSION LOGIC ---
+      const excludeCheckbox = document.getElementById('excludeDomain');
+      const domainLabel = document.getElementById('domainName');
+      
+      // Get current tab domain
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs && tabs[0] && tabs[0].url) {
+              try {
+                  const url = new URL(tabs[0].url);
+                  // We use hostname (subdomain.domain.com) or just domain?
+                  // Let's use hostname to be safe and specific.
+                  const hostname = url.hostname;
+                  
+                  // Ignore if it's not strictly a web page (e.g. settings, extensions, internal)
+                  if (!hostname || url.protocol === 'chrome:' || url.protocol === 'edge:' || url.protocol === 'about:') {
+                      excludeCheckbox.disabled = true;
+                      domainLabel.textContent = "Pàgina no vàlida";
+                      return;
+                  }
+
+                  domainLabel.textContent = hostname;
+                  const excludedList = result.excludedDomains || [];
+                  excludeCheckbox.checked = excludedList.includes(hostname);
+
+                  excludeCheckbox.addEventListener('change', () => {
+                      // Re-read storage to avoid race conditions
+                      chrome.storage.local.get(['excludedDomains'], (r2) => {
+                          const currentList = r2.excludedDomains || [];
+                          let newList;
+                          
+                          if (excludeCheckbox.checked) {
+                              // Add if not present
+                              if (!currentList.includes(hostname)) {
+                                  newList = [...currentList, hostname];
+                              } else {
+                                  newList = currentList;
+                              }
+                          } else {
+                              // Remove
+                              newList = currentList.filter(d => d !== hostname);
+                          }
+                          
+                          chrome.storage.local.set({ excludedDomains: newList }, () => {
+                              console.log('Updated excluded domains:', newList);
+                              // Optional: reloading the tab might be annoyance, so we just save.
+                              // If user wants to see changes, they will reload.
+                          });
+                      });
+                  });
+
+              } catch (e) {
+                  console.error("Invalid URL", e);
+                  excludeCheckbox.disabled = true;
+              }
+          } else {
+              excludeCheckbox.disabled = true;
+          }
+      });
   });
 
   // Botó de donació
