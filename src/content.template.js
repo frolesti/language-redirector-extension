@@ -78,9 +78,19 @@ function checkAndRedirect(attempt = 1) {
     // Obtenim l'idioma actual de la pàgina (atribut lang del tag html)
     const currentLang = document.documentElement.lang || '';
 
-    // Normalitzem per comparar només el codi d'idioma principal (ex: 'ca-ES' -> 'ca')
+    // normalitzem per comparar
     const simplePreferred = preferredLang.split('-')[0].toLowerCase();
     const simpleCurrent = currentLang.split('-')[0].toLowerCase();
+
+    // Check False Positives (Irisana.com case):
+    // If URL already contains the preferred language segment but content is NOT in that language.
+    // This implies the site is broken or serverside redirected back to wrong content.
+    // We should STOP to avoid loops.
+    const urlHasLang = window.location.pathname.split('/').map(s => s.toLowerCase()).includes(simplePreferred);
+    if (urlHasLang && simpleCurrent !== simplePreferred) {
+         console.log('Auto Language Redirector: URL contains preferred lang but content does not. Site might be misconfigured. Stopping to avoid loop.');
+         return;
+    }
 
     // Si ja estem en l'idioma preferit, no fem res.
     if (simpleCurrent === simplePreferred) {
@@ -95,7 +105,17 @@ function checkAndRedirect(attempt = 1) {
         let url = null;
 
         // 0. Custom Rules (Specific Sites)
-        // (Removed La Vanguardia specific rule because IDs and Slugs differ between languages, making simple redirection impossible)
+        const hostname = window.location.hostname;
+        const pathname = window.location.pathname;
+
+        // LA VANGUARDIA (Homepage ONLY)
+        // Articles use different IDs (e.g., 11429543 vs 11429700) and translated slugs.
+        // There are no 'hreflang' tags and no direct links in the DOM to the translated article.
+        // Therefore, we can ONLY safe-redirect the homepage.
+        if (hostname.includes('lavanguardia.com') && (pathname === '/' || pathname === '/index.html' || pathname === '')) {
+            // Ensure we don't loop if we are already there (though 'encatala' changes pathname)
+            url = 'https://www.lavanguardia.com/encatala';
+        }
 
         // 1. Strategy Hreflang (Head)
         const alternates = document.querySelectorAll('link[rel="alternate"][hreflang]');
@@ -151,6 +171,48 @@ function checkAndRedirect(attempt = 1) {
 
     targetUrl = findTargetUrl();
 
+    // Helper: Show Notice with Home Link
+    function showLanguageStructureNotice(homeLink) {
+         // Check session key
+         const NOTICE_KEY = 'alr_structure_notice_shown_' + window.location.hostname;
+         if (sessionStorage.getItem(NOTICE_KEY)) return;
+
+         const noticeDiv = document.createElement('div');
+         noticeDiv.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: #e3f2fd;
+                color: #0d47a1;
+                border: 1px solid #90caf9;
+                padding: 15px;
+                border-radius: 5px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 999999;
+                font-family: sans-serif;
+                font-size: 14px;
+                max-width: 320px;
+         `;
+         noticeDiv.innerHTML = `
+                <strong>ℹ️ {{NAME}}</strong><br>
+                Sembla que la traducció d'aquest article/pàgina no està disponible directament.<br>
+                Pots provar de visitar la <a href="${homeLink}" style="color:#0d47a1;text-decoration:underline;">Portada en ${preferredLang === 'ca' ? 'Català' : preferredLang.toUpperCase()}</a>.<br>
+                <button style="margin-top:10px; float:right; cursor:pointer; background:transparent; border:none; color:#0d47a1; font-weight:bold;">✕ Tancar</button>
+         `;
+            
+         noticeDiv.querySelector('button').onclick = () => noticeDiv.remove();
+         document.body.appendChild(noticeDiv);
+         sessionStorage.setItem(NOTICE_KEY, 'true');
+    }
+
+    // Specific alert for La Vanguardia Articles (Hardcoded rule)
+    if (!targetUrl && window.location.hostname.includes('lavanguardia.com') && preferredLang === 'ca') {
+         const path = window.location.pathname;
+         if (path !== '/' && path !== '/index.html' && path !== '') {
+            showLanguageStructureNotice('https://www.lavanguardia.com/encatala');
+         }
+    }
+
     // 2. Estratègia de Widgets JS (ex: Google Language Translator)
     // Alguns llocs (WordPress) fan servir plugins que no canvien la URL però usen cookies/JS.
     // Busquem elements amb classes típiques de plugins de traducció (ex: .nturl.ca)
@@ -179,8 +241,16 @@ function checkAndRedirect(attempt = 1) {
     // 3. Estratègia de Reemplaçament d'URL o Injecció de Prefix (Fallback)
     // Si no hem trobat hreflang ni widget, intentem deduir la URL.
     if (!targetUrl) {
-        try {
-            const currentUrl = new URL(window.location.href);
+        // EXCEPTION: Domains known to interpret '/ca/' as Canada (ISO 3166) instead of Catalan (ISO 639)
+        // These sites have English/French content at /ca/ and should NOT be redirected to automatically if the user wants Catalan.
+        const FALSE_FRIENDS_CA = ['filmaffinity.com', 'adobe.com', 'hp.com', 'dell.com', 'apple.com', 'microsoft.com', 'amazon.com', 'nike.com'];
+        const isFalseFriend = simplePreferred === 'ca' && FALSE_FRIENDS_CA.some(domain => hostname.includes(domain));
+
+        if (isFalseFriend) {
+             console.log('Auto Language Redirector: Domain is a False Friend (uses /ca/ for Canada). Skipping deduction.');
+        } else {
+            try {
+                const currentUrl = new URL(window.location.href);
             const pathSegments = currentUrl.pathname.split('/');
             
             // Busquem si algun segment del path coincideix amb l'idioma actual (ex: 'es' o 'es-ES')
@@ -256,6 +326,32 @@ function checkAndRedirect(attempt = 1) {
                              console.log(`Auto Language Redirector: URL redirects (${response.status}). Avoiding loop.`);
                         } else {
                             console.log(`Auto Language Redirector: URL invalid (${response.status}).`);
+                            
+                            // Start GENERALIZED Fallback for News/Broken Sites (Issue 1)
+                            // If correct URL is 404, check if Root Hompage exists and warn
+                            // ONLY if we haven't found anything else.
+                            const rootCandidates = [
+                                `https://${window.location.hostname}/${simplePreferred}/`,
+                                `https://${window.location.hostname}/${simplePreferred}`,
+                                `https://${window.location.hostname}/en${simplePreferred}/`, // encatala
+                                `https://${window.location.hostname}/en${simplePreferred}` 
+                            ];
+                            
+                            // We test just one common candidate for now to avoid spamming requests
+                            // Try '/ca/' first (or equivalent preferred)
+                            let fallbackHome = `https://${window.location.hostname}/${simplePreferred}/`;
+                            if (window.location.hostname.includes('lavanguardia.com')) fallbackHome = ''; // Already handled specific rule
+                            
+                            if (fallbackHome) {
+                                fetch(fallbackHome, { method: 'HEAD' }).then(rHome => {
+                                    if (rHome.ok && rHome.status === 200) {
+                                         // If Homepage exists, show Alert
+                                         if (typeof showLanguageStructureNotice === 'function') {
+                                             showLanguageStructureNotice(fallbackHome);
+                                         }
+                                    }
+                                }).catch(() => {}); 
+                            }
                         }
                     })
                     .catch(err => {
@@ -271,6 +367,7 @@ function checkAndRedirect(attempt = 1) {
         } catch (e) {
             console.error("Error deducing URL:", e);
         }
+        } // End else !isFalseFriend
     } else if (targetUrl && targetUrl !== window.location.href) {
       console.log('Auto Language Redirector: Target found via hreflang/lang. Redirecting to ' + targetUrl);
       window.location.href = targetUrl;
