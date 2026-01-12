@@ -206,6 +206,7 @@ foreach ($lang in $languages) {
         $manifestTemplate = Get-ManifestTemplate -BrowserName $browser
         $manifest = Get-Content -Raw -Path $manifestTemplate -Encoding UTF8
         $manifest = $manifest.Replace("{{NAME}}", $cfg.name)
+        $manifest = $manifest.Replace("{{ID_NAME}}", $cfg.zipName)
         $manifest = $manifest.Replace("{{DESCRIPTION}}", $cfg.description)
         $manifest = $manifest.Replace("{{VERSION}}", $Version)
         Set-Content -Path "$targetDir/manifest.json" -Value $manifest -Encoding UTF8
