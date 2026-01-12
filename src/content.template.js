@@ -193,14 +193,35 @@ function checkAndRedirect(attempt = 1) {
                 font-size: 14px;
                 max-width: 320px;
          `;
-         noticeDiv.innerHTML = `
-                <strong>ℹ️ {{NAME}}</strong><br>
-                Sembla que la traducció d'aquest article/pàgina no està disponible directament.<br>
-                Pots provar de visitar la <a href="${homeLink}" style="color:#0d47a1;text-decoration:underline;">Portada en ${preferredLang === 'ca' ? 'Català' : preferredLang.toUpperCase()}</a>.<br>
-                <button style="margin-top:10px; float:right; cursor:pointer; background:transparent; border:none; color:#0d47a1; font-weight:bold;">✕ Tancar</button>
-         `;
-            
-         noticeDiv.querySelector('button').onclick = () => noticeDiv.remove();
+         noticeDiv.textContent = ''; // Clear content safely
+         
+         const title = document.createElement('strong');
+         title.textContent = 'ℹ️ {{NAME}}';
+         noticeDiv.appendChild(title);
+         noticeDiv.appendChild(document.createElement('br'));
+         
+         const text1 = document.createTextNode("Sembla que la traducció d'aquest article/pàgina no està disponible directament.");
+         noticeDiv.appendChild(text1);
+         noticeDiv.appendChild(document.createElement('br'));
+         
+         const text2 = document.createTextNode("Pots provar de visitar la ");
+         noticeDiv.appendChild(text2);
+         
+         const link = document.createElement('a');
+         link.href = homeLink;
+         link.style.color = '#0d47a1';
+         link.style.textDecoration = 'underline';
+         link.textContent = `Portada en ${preferredLang === 'ca' ? 'Català' : preferredLang.toUpperCase()}`;
+         noticeDiv.appendChild(link);
+         
+         noticeDiv.appendChild(document.createElement('br'));
+
+         const btn = document.createElement('button');
+         btn.style.cssText = "margin-top:10px; float:right; cursor:pointer; background:transparent; border:none; color:#0d47a1; font-weight:bold;";
+         btn.textContent = "✕ Tancar";
+         btn.onclick = () => noticeDiv.remove();
+         noticeDiv.appendChild(btn);
+         
          document.body.appendChild(noticeDiv);
          sessionStorage.setItem(NOTICE_KEY, 'true');
     }

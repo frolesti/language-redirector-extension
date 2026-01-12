@@ -7,7 +7,6 @@
     "storage"
   ],
   "icons": {
-    "48": "icons/logo.png",
     "128": "icons/logo.png"
   },
   "background": {
@@ -16,8 +15,13 @@
   "browser_action": {
     "default_popup": "src/popup/popup.html",
     "default_icon": {
-      "48": "icons/logo.png",
       "128": "icons/logo.png"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{{NAME}}@extension",
+      "strict_min_version": "109.0"
     }
   },
   "content_scripts": [
