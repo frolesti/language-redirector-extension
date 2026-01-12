@@ -93,6 +93,20 @@ function checkAndRedirect(attempt = 1) {
     // Helper function to find target URL
     function findTargetUrl() {
         let url = null;
+
+        // 0. Custom Rules (Specific Sites)
+        const hostname = window.location.hostname;
+        const pathname = window.location.pathname;
+
+        // La Vanguardia (Castellano -> Català)
+        // Només si l'idioma preferit és el català i no estem ja a la secció /encatala
+        if (hostname.includes('lavanguardia.com') && preferredLang.toLowerCase().startsWith('ca')) {
+            if (!pathname.startsWith('/encatala')) {
+                // Construct new URL: origin + /encatala + current_path
+                url = window.location.origin + '/encatala' + pathname + window.location.search + window.location.hash;
+                return url;
+            }
+        }
         
         // 1. Strategy Hreflang (Head)
         const alternates = document.querySelectorAll('link[rel="alternate"][hreflang]');
