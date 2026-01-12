@@ -174,6 +174,28 @@ function checkAndRedirect(attempt = 1) {
              }
         });
 
+        // 1.7. Strategy Text Content (Fallback for missing metadata)
+        // Busca enllaços que es diguin exactament "Català", "Galego", etc.
+        if (!url) {
+             const allLinks = document.querySelectorAll('a');
+             const targetTexts = [];
+             if (simplePreferred === 'ca') targetTexts.push('català', 'valencià', 'cat');
+             if (simplePreferred === 'gl') targetTexts.push('galego', 'gal');
+             if (simplePreferred === 'eu') targetTexts.push('euskara', 'eus', 'euskera');
+             
+             for (const link of allLinks) {
+                 const text = link.textContent.trim().toLowerCase();
+                 // Evitem falsos positius verificant que el text sigui curt (només l'idioma)
+                 if (targetTexts.includes(text)) {
+                     if (link.href && !link.href.startsWith('javascript') && !link.href.includes('#')) {
+                         console.log(`Auto Language Redirector: Found link by text "${text}": ${link.href}`);
+                         url = link.href;
+                         break;
+                     }
+                 }
+             }
+        }
+
         return url;
     }
 
