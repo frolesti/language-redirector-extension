@@ -244,7 +244,7 @@ function checkAndRedirect(attempt = 1) {
         // EXCEPTION: Domains known to interpret '/ca/' as Canada (ISO 3166) instead of Catalan (ISO 639)
         // These sites have English/French content at /ca/ and should NOT be redirected to automatically if the user wants Catalan.
         const FALSE_FRIENDS_CA = ['filmaffinity.com', 'adobe.com', 'hp.com', 'dell.com', 'apple.com', 'microsoft.com', 'amazon.com', 'nike.com'];
-        const isFalseFriend = simplePreferred === 'ca' && FALSE_FRIENDS_CA.some(domain => hostname.includes(domain));
+        const isFalseFriend = simplePreferred === 'ca' && FALSE_FRIENDS_CA.some(domain => window.location.hostname.includes(domain));
 
         if (isFalseFriend) {
              console.log('Auto Language Redirector: Domain is a False Friend (uses /ca/ for Canada). Skipping deduction.');
