@@ -15,6 +15,40 @@ $browsers = if ($Browser -eq "all") {
 }
 
 Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+function Create-Zip-Normalized {
+    param(
+        [string]$SourceDirectory,
+        [string]$DestinationFile
+    )
+
+    $sourceDirInfo = Get-Item -LiteralPath $SourceDirectory
+    $sourceDirPath = $sourceDirInfo.FullName
+    
+    # Ensure trailing slash for subtraction
+    if (-not $sourceDirPath.EndsWith([System.IO.Path]::DirectorySeparatorChar)) { 
+        $sourceDirPath += [System.IO.Path]::DirectorySeparatorChar 
+    }
+
+    $zip = [System.IO.Compression.ZipFile]::Open($DestinationFile, [System.IO.Compression.ZipArchiveMode]::Create)
+
+    try {
+        $files = Get-ChildItem -LiteralPath $SourceDirectory -Recurse -File
+        
+        foreach ($file in $files) {
+            # Calculate relative path
+            $relativePath = $file.FullName.Substring($sourceDirPath.Length)
+            # FORCE forward slashes for ZIP compatibility (Critical for Firefox Validation)
+            $entryName = $relativePath.Replace("\", "/")
+            
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $file.FullName, $entryName)
+        }
+    }
+    finally {
+        $zip.Dispose()
+    }
+}
 
 function Update-Icon {
     param (
@@ -200,10 +234,13 @@ foreach ($lang in $languages) {
         $contentJs = $contentJs.Replace("{{NAME}}", $cfg.name)
         Set-Content -Path "$targetDir/src/content.js" -Value $contentJs -Encoding UTF8
 
-        # Zip folder
+        # Zip folder with Normalized Paths (Firefox Fix)
         $zipName = "build/$buildName.zip"
         if (Test-Path $zipName) { Remove-Item $zipName }
-        Compress-Archive -Path "$targetDir/*" -DestinationPath $zipName -Force
+        
+        # Use custom function instead of Compress-Archive to enforce forward slashes
+        Create-Zip-Normalized -SourceDirectory $targetDir -DestinationFile $zipName
+        
         Write-Host "Created $zipName"
     }
     
