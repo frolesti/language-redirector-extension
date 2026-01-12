@@ -1,8 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Forcem l'idioma en instal·lar/obrir (només si no està definit)
-  chrome.storage.sync.get(['preferredLanguage', 'isEnabled'], (result) => {
+  chrome.storage.local.get(['preferredLanguage', 'isEnabled'], (result) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error storage:', chrome.runtime.lastError);
+        result = {}; // Fallback
+      }
+      result = result || {};
+
       if (!result.preferredLanguage) {
-          chrome.storage.sync.set({ preferredLanguage: '{{PREFERRED_LANGUAGE}}' });
+          chrome.storage.local.set({ preferredLanguage: '{{PREFERRED_LANGUAGE}}' });
       }
       
       // Gestió del toggle
@@ -16,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       toggle.addEventListener('change', () => {
           const newState = toggle.checked;
-          chrome.storage.sync.set({ isEnabled: newState });
+          chrome.storage.local.set({ isEnabled: newState });
           updateLabel(newState);
           
           // Update icon immediately
@@ -50,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reportBtn = document.getElementById('report');
   if (reportBtn) {
     reportBtn.addEventListener('click', () => {
-      chrome.tabs.update({ url: 'mailto:frolesti4@gmail.com?subject={{REPORT_SUBJECT}}' });
+      chrome.tabs.create({ url: 'mailto:frolesti4@gmail.com?subject={{REPORT_SUBJECT}}' });
     });
   }
 });

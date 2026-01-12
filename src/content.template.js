@@ -2,7 +2,19 @@
 
 function checkAndRedirect(attempt = 1) {
   // Recuperem l'estat d'activació (l'idioma és fix per extensió)
-  chrome.storage.sync.get(['isEnabled'], function(result) {
+  chrome.storage.local.get(['isEnabled'], function(result) {
+    // Gestió d'errors de lectura (defensa contra errors a Firefox)
+    if (chrome.runtime.lastError) {
+      console.warn('Auto Language Redirector: Error llegint configuració:', chrome.runtime.lastError);
+      // Si falla, continuem assumint que està activat
+      result = { isEnabled: true };
+    }
+    
+    // Si result és undefined per algun motiu estrany
+    if (!result) {
+      result = { isEnabled: true };
+    }
+
     // Si està desactivat explícitament, no fem res
     if (result.isEnabled === false) {
         console.log('Auto Language Redirector: Extensió desactivada per l\'usuari.');

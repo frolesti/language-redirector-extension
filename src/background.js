@@ -4,21 +4,23 @@ function updateIcon(isEnabled) {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.get(['isEnabled'], (result) => {
-    const isEnabled = result.isEnabled !== false;
+  chrome.storage.local.get(['isEnabled'], (result) => {
+    if (chrome.runtime.lastError) return; // Ignorar errors
+    const isEnabled = result && result.isEnabled !== false;
     updateIcon(isEnabled);
   });
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  chrome.storage.sync.get(['isEnabled'], (result) => {
-    const isEnabled = result.isEnabled !== false;
+  chrome.storage.local.get(['isEnabled'], (result) => {
+    if (chrome.runtime.lastError) return;
+    const isEnabled = result && result.isEnabled !== false;
     updateIcon(isEnabled);
   });
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
-  if (namespace === 'sync' && changes.isEnabled) {
+  if (namespace === 'local' && changes.isEnabled) {
     updateIcon(changes.isEnabled.newValue);
   }
 });
