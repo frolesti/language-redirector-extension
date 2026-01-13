@@ -4,7 +4,10 @@
   "version": "{{VERSION}}",
   "description": "{{DESCRIPTION}}",
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab",
+    "tabs",
+    "<all_urls>"
   ],
   "icons": {
     "128": "icons/logo.png"

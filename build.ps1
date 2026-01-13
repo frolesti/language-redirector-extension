@@ -1,7 +1,7 @@
 ﻿param (
     [string]$Language = "all",
     [string]$Browser = "all",
-    [string]$Version = "1.6"
+    [string]$Version = "1.7"
 )
 
 $config = Get-Content -Raw -Path "config.json" -Encoding UTF8 | ConvertFrom-Json
@@ -219,6 +219,7 @@ foreach ($lang in $languages) {
         $popupHtml = $popupHtml.Replace("{{REPORT_TEXT}}", $cfg.reportText)
         $popupHtml = $popupHtml.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
         $popupHtml = $popupHtml.Replace("{{EXCLUDE_TEXT}}", $cfg.excludeText)
+        $popupHtml = $popupHtml.Replace("{{MANAGE_EXCLUSIONS_TEXT}}", $cfg.manageExclusionsText)
         $popupHtml = $popupHtml.Replace("{{LANG_CODE}}", $lang)
         Set-Content -Path "$targetDir/src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 
@@ -228,6 +229,7 @@ foreach ($lang in $languages) {
         $popupJs = $popupJs.Replace("{{REPORT_SUBJECT}}", [System.Uri]::EscapeDataString($cfg.reportSubject))
         $popupJs = $popupJs.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
         $popupJs = $popupJs.Replace("{{DISABLE_TEXT}}", $cfg.disableText)
+        $popupJs = $popupJs.Replace("{{NO_EXCLUSIONS_TEXT}}", $cfg.noExclusionsText)
         Set-Content -Path "$targetDir/src/popup/popup.js" -Value $popupJs -Encoding UTF8
 
         # Process Content JS

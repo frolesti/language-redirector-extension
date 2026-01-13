@@ -11,7 +11,9 @@
     "reportSubject": "Error - En Català, Sisplau",
     "enableText": "Activat",
     "disableText": "Desactivat",
-    "excludeText": "No traduir mai aquest web",
+    "excludeText": "No redirigir automàticament aquest web",
+    "manageExclusionsText": "Gestionar webs exclosos",
+    "noExclusionsText": "Cap web exclòs",
     "iconSource": "assets/img/icons/logo_ca.png"
   },
   "gl": {
@@ -26,7 +28,9 @@
     "reportSubject": "Erro - En Galego Por Favor",
     "enableText": "Activado",
     "disableText": "Desactivado",
-    "excludeText": "Non traducir nunca esta web",
+    "excludeText": "Non redirixir automaticamente esta web",
+    "manageExclusionsText": "Xestionar webs excluídas",
+    "noExclusionsText": "Ningunha web excluída",
     "iconSource": "assets/img/icons/logo_gl.png"
   },
   "eu": {
@@ -41,7 +45,9 @@
     "reportSubject": "Errorea - Euskaraz Mesedez",
     "enableText": "Aktibatuta",
     "disableText": "Desaktibatuta",
-    "excludeText": "Ez itzuli webgune hau",
+    "excludeText": "Ez birbideratu automatikoki webgune hau",
+    "manageExclusionsText": "Kudeatu baztertutako webguneak",
+    "noExclusionsText": "Ez da webgunerik baztertu",
     "iconSource": "assets/img/icons/logo_eu.png"
   }
 }

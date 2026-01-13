@@ -18,8 +18,15 @@ function checkAndRedirect(attempt = 1) {
     // 0. CHECK EXCLUSIONS
     const hostname = window.location.hostname;
     const excludedList = result.excludedDomains || [];
-    if (excludedList.includes(hostname)) {
-        console.log(`Auto Language Redirector: Domain ${hostname} is excluded by user. Skipping.`);
+    
+    // Check if hostname matches any excluded domain (exact match or subdomain)
+    // Example: if 'wikipedia.org' is excluded, 'es.wikipedia.org' (endsWith .wikipedia.org) should be skipped.
+    const isExcluded = excludedList.some(domain => 
+        hostname === domain || hostname.endsWith('.' + domain)
+    );
+
+    if (isExcluded) {
+        console.log(`Auto Language Redirector: Domain ${hostname} is excluded (matched: ${excludedList.find(d => hostname === d || hostname.endsWith('.' + d))}). Skipping.`);
         return;
     }
 

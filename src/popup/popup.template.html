@@ -9,7 +9,7 @@
     <h3>{{POPUP_TITLE}}</h3>
     <p style="text-align: center; color: #555;">{{POPUP_TEXT}}</p>
     
-    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
       <label class="switch">
         <input type="checkbox" id="toggleExtension">
         <span class="slider round"></span>
@@ -18,16 +18,27 @@
     </div>
 
     <!-- Exclusion Checkbox -->
-    <div style="margin-bottom: 20px; font-size: 0.9em; color: #555; text-align: left; padding: 0 10px;">
+    <div style="margin-top: 25px; margin-bottom: 20px; font-size: 0.9em; color: #555; text-align: left; padding: 0 5px;">
         <label style="display: flex; align-items: center; cursor: pointer;">
             <input type="checkbox" id="excludeDomain" style="margin-right: 8px;">
-            <span>{{EXCLUDE_TEXT}}</span>
+            <span style="user-select: none;">{{EXCLUDE_TEXT}}</span>
         </label>
-        <div id="domainName" style="font-size: 0.8em; color: #888; margin-left: 20px; margin-top: 2px;"></div>
+        <div id="domainName" style="font-size: 0.85em; color: #777; margin-left: 20px; margin-top: 4px; font-family: monospace;"></div>
     </div>
 
     <button id="donate">{{DONATE_TEXT}}</button>
     <button id="report">{{REPORT_TEXT}}</button>
+
+    <!-- Exclusions Manager -->
+    <div style="margin-top: 15px; text-align: left; padding: 10px 5px; border-top: 1px solid #eee;">
+        <details>
+            <summary style="cursor: pointer; font-size: 0.85em; color: #777; outline: none; user-select: none;">{{MANAGE_EXCLUSIONS_TEXT}}</summary>
+            <ul id="excludedList" style="list-style: none; padding: 0; margin: 10px 0 0 0; max-height: 120px; overflow-y: auto; font-size: 0.85em; color: #555;">
+                <!-- populated by js -->
+            </ul>
+        </details>
+    </div>
+
     <p id="status" style="display:none;"></p>
   </div>
   <script src="popup.js"></script>
