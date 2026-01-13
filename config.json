@@ -1,14 +1,14 @@
 {
   "ca": {
-    "name": "En Català, Sisplau",
+    "name": "En Català, si us plau",
     "description": "Navega automàticament en català sempre que sigui possible.",
     "preferredLanguage": "ca",
     "zipName": "EnCatalaSisplau",
-    "popupTitle": "En Català, Sisplau",
+    "popupTitle": "En Català, si us plau",
     "popupText": "Aquesta extensió redirigirà automàticament les webs a la versió en català.",
     "donateText": "Fes-te mecenes a Aixeta.cat",
     "reportText": "Notificar un error",
-    "reportSubject": "Error - En Català, Sisplau",
+    "reportSubject": "Error - En Català, si us plau",
     "enableText": "Activat",
     "disableText": "Desactivat",
     "excludeText": "No redirigir automàticament aquest web",

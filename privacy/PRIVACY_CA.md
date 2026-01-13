@@ -2,7 +2,7 @@
 
 **Última actualització:** 21 de desembre de 2025
 
-Aquesta Política de Privacitat descriu com l'extensió **En Català, Sisplau** (d'ara endavant, "l'Extensió") gestiona la informació de l'usuari. Ens prenem molt seriosament la vostra privacitat i ens comprometem a ser transparents sobre les nostres pràctiques.
+Aquesta Política de Privacitat descriu com l'extensió **En Català, si us plau** (d'ara endavant, "l'Extensió") gestiona la informació de l'usuari. Ens prenem molt seriosament la vostra privacitat i ens comprometem a ser transparents sobre les nostres pràctiques.
 
 ## 1. Recopilació de Dades
 L'Extensió **no recopila, emmagatzema, comparteix ni transmet cap dada personal** de l'usuari a servidors externs ni a tercers. No tenim bases de dades d'usuaris ni sistemes de seguiment.

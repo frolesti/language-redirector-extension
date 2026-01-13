@@ -2,13 +2,13 @@
 
 **Navega en la teva llengua**
 
-Aquesta extensió de navegador detecta automàticament si la pàgina web que estàs visitant té una versió disponible en el teu idioma preferit i et redirigeix. Per exemple, si tens l'extensió configurada en Català ("En Català, Sisplau") i visites `barcelona.cat/es`, et redirigirà automàticament a `barcelona.cat/ca`.
+Aquesta extensió de navegador detecta automàticament si la pàgina web que estàs visitant té una versió disponible en el teu idioma preferit i et redirigeix. Per exemple, si tens l'extensió configurada en Català ("En Català, si us plau") i visites `barcelona.cat/es`, et redirigirà automàticament a `barcelona.cat/ca`.
 
 ## 📦 Descarregar l'Extensió
 
 Tria la teva variant i instal·la l'extensió al teu navegador preferit:
 
-### 🟡 En Català, Sisplau
+### 🟡 En Català, si us plau
 *Per a usuaris que volen navegar en català.*
 
 | Navegador | Enllaç de descàrrega |

@@ -2,16 +2,16 @@
 
 Aquest document conté els textos preparats per fer "copiar i enganxar" quan pugis l'extensió a la Chrome Web Store, Microsoft Edge Add-ons, etc.
 
-## 🟢 CATALÀ (En Català, Sisplau)
+## 🟢 CATALÀ (En Català, si us plau)
 
 **Nom de l'aplicació:**
-En Català, Sisplau
+En Català, si us plau
 
 **Descripció Curta (Summary):**
 Navega automàticament en català sempre que sigui possible mitjançant redireccions intel·ligents.
 
 **Descripció Llarga (Description):**
-Cansat d'haver de canviar l'idioma manualment cada vegada que entres a una web? "En Català, Sisplau" ho fa per tu.
+Cansat d'haver de canviar l'idioma manualment cada vegada que entres a una web? "En Català, si us plau" ho fa per tu.
 
 Aquesta extensió detecta automàticament si la pàgina que estàs visitant té una versió en català disponible i et redirigeix sense que hagis de fer res. Funciona de manera transparent i ràpida.
 
