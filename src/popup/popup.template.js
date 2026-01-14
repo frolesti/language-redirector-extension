@@ -215,29 +215,74 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
-  chrome.i18n.getAcceptLanguages((languages) => {
-      const targetLang = '{{PREFERRED_LANGUAGE}}';
-      if (languages && languages.length > 0) {
-          const firstLang = languages[0].toLowerCase();
-          // Check if the FIRST language matches the target (e.g., 'ca' or 'ca-es')
-          if (!firstLang.startsWith(targetLang)) {
-              const warnBox = document.getElementById('langWarning');
-              if (warnBox) {
-                  warnBox.style.display = 'block';
-                  
-                  const link = document.getElementById('langFixLink');
-                  if (link) {
-                      if (targetLang === 'ca') {
-                          link.href = "https://configura.cat/google";
-                          link.target = "_blank";
-                      } else {
-                          // Hide link for other languages where we don't have a specific guide yet
-                          link.style.display = 'none';
-                      }
-                  }
-              }
-          }
-      }
+  chrome.storage.local.get(['langWarnMinimized'], (storageResult) => {
+    const isMinimized = storageResult.langWarnMinimized === true;
+
+    chrome.i18n.getAcceptLanguages((languages) => {
+        const targetLang = '{{PREFERRED_LANGUAGE}}';
+        if (languages && languages.length > 0) {
+            const firstLang = languages[0].toLowerCase();
+            // Check if the FIRST language matches the target (e.g., 'ca' or 'ca-es')
+            if (!firstLang.startsWith(targetLang)) {
+                
+                const container = document.getElementById('langWarningContainer');
+                const contentBox = document.getElementById('langWarningContent');
+                const minimizedBox = document.getElementById('langWarningMinimized');
+                
+                if (container && contentBox && minimizedBox) {
+                    container.style.display = 'block';
+
+                    // Function to update UI based on state
+                    const setUIState = (minimized) => {
+                        if (minimized) {
+                            contentBox.style.display = 'none';
+                            minimizedBox.style.display = 'block';
+                        } else {
+                            contentBox.style.display = 'block';
+                            minimizedBox.style.display = 'none';
+                        }
+                    };
+
+                    // Initial State
+                    setUIState(isMinimized);
+                    
+                    // Close button -> Minimize
+                    const closeBtn = document.getElementById('closeLangWarning');
+                    if (closeBtn) {
+                        closeBtn.onclick = () => {
+                            setUIState(true);
+                            chrome.storage.local.set({ langWarnMinimized: true });
+                        };
+                    }
+
+                    // Minimized strip -> Expand
+                    minimizedBox.onclick = () => {
+                        setUIState(false);
+                        chrome.storage.local.set({ langWarnMinimized: false });
+                    };
+
+                    // Links Logic
+                    const moreInfoLink = document.getElementById('langMoreInfoLink');
+                    const fixLink = document.getElementById('langFixLink');
+
+                    if (targetLang === 'ca') {
+                        if (moreInfoLink) {
+                            moreInfoLink.href = "https://configura.cat/";
+                            moreInfoLink.target = "_blank";
+                        }
+                        if (fixLink) {
+                            fixLink.href = "https://configura.cat/google";
+                            fixLink.target = "_blank";
+                        }
+                    } else {
+                        // Hide links for other languages if no URL available
+                        if (moreInfoLink) moreInfoLink.style.display = 'none';
+                        if (fixLink) fixLink.style.display = 'none';
+                    }
+                }
+            }
+        }
+    });
   });
 
 });

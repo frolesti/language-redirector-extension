@@ -4,44 +4,59 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="popup.css">
+  <style>
+      body { overflow-x: hidden; overflow-y: hidden; } 
+  </style>
 </head>
 <body class="{{LANG_CODE}}">
   <div class="container">
     <h3>{{POPUP_TITLE}}</h3>
     
     <!-- Browser Language Warning -->
-    <div id="langWarning" style="display: none; background-color: #fff3cd; color: #856404; padding: 10px; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; text-align: left;">
-        {{BROWSER_LANG_WARN}}
-        <a id="langFixLink" href="#" style="color: #533f03; text-decoration: underline; font-weight: bold; display: block; margin-top: 5px;">Més informació i solució</a>
+    <div id="langWarningContainer" style="display: none; margin-bottom: 8px;">
+        <!-- Full Warning -->
+        <div id="langWarningContent" style="position: relative; background-color: #fff3cd; color: #856404; padding: 8px; padding-right: 25px; border: 1px solid #ffeeba; border-radius: 4px; font-size: 0.85em; text-align: left;">
+            <button id="closeLangWarning" style="position: absolute; top: 2px; right: 2px; width: auto; margin: 0; background: transparent; border: none; font-size: 1.2em; cursor: pointer; color: #856404; line-height: 1; padding: 0;" title="Minimitzar">&times;</button>
+            {{BROWSER_LANG_WARN}}
+            <div style="margin-top: 4px; display: flex; gap: 10px;">
+                <a id="langMoreInfoLink" href="#" style="color: #533f03; text-decoration: underline; font-weight: bold;">{{BROWSER_LANG_MORE_INFO}}</a>
+                <a id="langFixLink" href="#" style="color: #533f03; text-decoration: underline; font-weight: bold;">{{BROWSER_LANG_SOLUTION}}</a>
+            </div>
+        </div>
+
+        <!-- Minimized Warning (Strip) -->
+        <div id="langWarningMinimized" style="display: none; background-color: #fff3cd; color: #856404; padding: 2px; border: 1px solid #ffeeba; border-radius: 4px; text-align: center; cursor: pointer;" title="Mostrar avís de llengua">
+            ⚠️
+        </div>
     </div>
 
-    <p style="text-align: center; color: #555;">{{POPUP_TEXT}}</p>
+    <p style="text-align: center; color: #555; margin: 5px 0 10px 0; font-size: 0.9em;">{{POPUP_TEXT}}</p>
     
-    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
-      <label class="switch">
+    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+      <label class="switch" style="margin-bottom:0;">
         <input type="checkbox" id="toggleExtension">
         <span class="slider round"></span>
       </label>
-      <span id="toggleLabel" style="margin-left: 10px; font-weight: bold;">{{ENABLE_TEXT}}</span>
+      <span id="toggleLabel" style="margin-left: 10px; font-weight: bold; font-size: 0.95em;">{{ENABLE_TEXT}}</span>
     </div>
 
     <!-- Exclusion Checkbox -->
-    <div style="margin-top: 25px; margin-bottom: 20px; font-size: 0.9em; color: #555; text-align: left; padding: 0 5px;">
-        <label style="display: flex; align-items: center; cursor: pointer;">
+    <div style="margin-top: 20px; margin-bottom: 15px; font-size: 0.9em; color: #555; text-align: left; padding: 0 5px;">
+        <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 0;">
             <input type="checkbox" id="excludeDomain" style="margin-right: 8px;">
             <span style="user-select: none;">{{EXCLUDE_TEXT}}</span>
         </label>
-        <div id="domainName" style="font-size: 0.85em; color: #777; margin-left: 20px; margin-top: 4px; font-family: monospace;"></div>
+        <div id="domainName" style="font-size: 0.85em; color: #777; margin-left: 20px; margin-top: 2px; font-family: monospace;"></div>
     </div>
 
     <button id="donate">{{DONATE_TEXT}}</button>
     <button id="report">{{REPORT_TEXT}}</button>
 
     <!-- Exclusions Manager -->
-    <div style="margin-top: 15px; text-align: left; padding: 10px 5px; border-top: 1px solid #eee;">
+    <div style="margin-top: 10px; text-align: left; padding: 10px 5px; border-top: 1px solid #eee;">
         <details>
             <summary style="cursor: pointer; font-size: 0.85em; color: #777; outline: none; user-select: none;">{{MANAGE_EXCLUSIONS_TEXT}}</summary>
-            <ul id="excludedList" style="list-style: none; padding: 0; margin: 10px 0 0 0; max-height: 120px; overflow-y: auto; font-size: 0.85em; color: #555;">
+            <ul id="excludedList" style="list-style: none; padding: 0; margin: 0; max-height: 120px; overflow-y: auto; font-size: 0.85em; color: #555;">
                 <!-- populated by js -->
             </ul>
         </details>

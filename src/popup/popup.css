@@ -1,7 +1,7 @@
 body {
   width: 320px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
+  padding: 12px;
   margin: 0;
   background-color: #f8f9fa;
   color: #333;
@@ -45,7 +45,7 @@ body.ca, body.gl, body.eu {
 }
 
 h3 {
-  margin: 0 0 15px 0;
+  margin: 0 0 10px 0;
   color: #2c3e50;
   font-size: 18px;
   text-align: center;
@@ -53,9 +53,9 @@ h3 {
 }
 
 label {
-  font-size: 14px;
+  font-size: 13px;
   color: #495057;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-weight: 500;
   display: block;
 }
@@ -63,14 +63,14 @@ label {
 /* Buttons */
 button {
     border: none;
-    padding: 12px 15px;
+    padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
     transition: transform 0.1s, opacity 0.2s;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 button:active {
@@ -158,30 +158,6 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 15px;
-  transition: background-color 0.15s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-button:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-}
-
-button:active {
-  transform: translateY(1px);
 }
 
 #status {
@@ -193,58 +169,4 @@ button:active {
   font-weight: 500;
 }
 
-/* Switch styles */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 50px;
-  height: 24px;
-}
-
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
-
-
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
 
