@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reportBtn = document.getElementById('report');
   if (reportBtn) {
     reportBtn.addEventListener('click', () => {
-      chrome.tabs.create({ url: 'mailto:frolesti4@gmail.com?subject={{REPORT_SUBJECT}}' });
+      chrome.tabs.create({ url: 'mailto:suport.encatala@gmail.com?subject={{REPORT_SUBJECT}}' });
     });
   }
 });
