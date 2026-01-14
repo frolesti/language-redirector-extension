@@ -1,22 +1,5 @@
-node_modules
-.DS_Store
-*.log
-
 # Generated files (Build artifacts)
 build/
 *.zip
-manifest.json
-src/content.js
-src/popup/popup.html
-src/popup/popup.js
-
-# Scripts & temporary assets (Local only)
-assets/img/scripts/
-inspect_irta.py
-inspect_irta_2.py
-
-VIDEO_SCRIPT.md
-assets/promo/ca/en catala siusplau/en catala siusplau.MP3
 assets/promo/ca/en catala siusplau/en catala siusplau.mp4
-privacy/PRIVACY_CA.md
-VIDEO_SCRIPT.md
+assets/img/scripts
