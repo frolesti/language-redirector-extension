@@ -14,7 +14,7 @@
     "excludeText": "No redirigir automàticament aquest web",
     "manageExclusionsText": "Gestionar webs exclosos",
     "noExclusionsText": "Cap web exclòs",
-    "browserLangWarn": "⚠️ El teu navegador no està configurat en català. Configura'l per ser comptat digitalment.",
+    "browserLangWarn": "⚠️ Detectem que no tens el navegador en català. Això afecta negativament al pes de la llengua a Internet. Saps per què?",
     "iconSource": "assets/img/icons/logo_ca.png"
   },
   "gl": {

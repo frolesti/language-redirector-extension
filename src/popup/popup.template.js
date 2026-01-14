@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   const link = document.getElementById('langFixLink');
                   if (link) {
                       if (targetLang === 'ca') {
-                          link.href = "https://www.softcatala.org/configura/";
+                          link.href = "https://configura.cat/google";
                           link.target = "_blank";
                       } else {
                           // Hide link for other languages where we don't have a specific guide yet
