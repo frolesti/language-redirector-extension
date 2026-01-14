@@ -8,6 +8,13 @@
 <body class="{{LANG_CODE}}">
   <div class="container">
     <h3>{{POPUP_TITLE}}</h3>
+    
+    <!-- Browser Language Warning -->
+    <div id="langWarning" style="display: none; background-color: #fff3cd; color: #856404; padding: 10px; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 15px; font-size: 0.9em; text-align: left;">
+        {{BROWSER_LANG_WARN}}
+        <a id="langFixLink" href="#" style="color: #533f03; text-decoration: underline; font-weight: bold; display: block; margin-top: 5px;">Més info</a>
+    </div>
+
     <p style="text-align: center; color: #555;">{{POPUP_TEXT}}</p>
     
     <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">

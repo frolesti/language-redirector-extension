@@ -14,6 +14,7 @@
     "excludeText": "No redirigir automàticament aquest web",
     "manageExclusionsText": "Gestionar webs exclosos",
     "noExclusionsText": "Cap web exclòs",
+    "browserLangWarn": "⚠️ El teu navegador no està configurat en català. Configura'l per ser comptat digitalment.",
     "iconSource": "assets/img/icons/logo_ca.png"
   },
   "gl": {
@@ -31,6 +32,7 @@
     "excludeText": "Non redirixir automaticamente esta web",
     "manageExclusionsText": "Xestionar webs excluídas",
     "noExclusionsText": "Ningunha web excluída",
+    "browserLangWarn": "⚠️ O teu navegador non está configurado en galego. Configurao para contar dixitalmente.",
     "iconSource": "assets/img/icons/logo_gl.png"
   },
   "eu": {
@@ -48,6 +50,7 @@
     "excludeText": "Ez birbideratu automatikoki webgune hau",
     "manageExclusionsText": "Kudeatu baztertutako webguneak",
     "noExclusionsText": "Ez da webgunerik baztertu",
+    "browserLangWarn": "⚠️ Zure nabigatzailea ez dago euskaraz konfiguratuta.",
     "iconSource": "assets/img/icons/logo_eu.png"
   }
 }

@@ -220,6 +220,7 @@ foreach ($lang in $languages) {
         $popupHtml = $popupHtml.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
         $popupHtml = $popupHtml.Replace("{{EXCLUDE_TEXT}}", $cfg.excludeText)
         $popupHtml = $popupHtml.Replace("{{MANAGE_EXCLUSIONS_TEXT}}", $cfg.manageExclusionsText)
+        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_WARN}}", $cfg.browserLangWarn)
         $popupHtml = $popupHtml.Replace("{{LANG_CODE}}", $lang)
         Set-Content -Path "$targetDir/src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 

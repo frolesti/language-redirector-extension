@@ -213,4 +213,31 @@ document.addEventListener('DOMContentLoaded', () => {
       chrome.tabs.create({ url: 'mailto:frolesti4@gmail.com?subject={{REPORT_SUBJECT}}' });
     });
   }
+
+  // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
+  chrome.i18n.getAcceptLanguages((languages) => {
+      const targetLang = '{{PREFERRED_LANGUAGE}}';
+      if (languages && languages.length > 0) {
+          const firstLang = languages[0].toLowerCase();
+          // Check if the FIRST language matches the target (e.g., 'ca' or 'ca-es')
+          if (!firstLang.startsWith(targetLang)) {
+              const warnBox = document.getElementById('langWarning');
+              if (warnBox) {
+                  warnBox.style.display = 'block';
+                  
+                  const link = document.getElementById('langFixLink');
+                  if (link) {
+                      if (targetLang === 'ca') {
+                          link.href = "https://www.softcatala.org/configura/";
+                          link.target = "_blank";
+                      } else {
+                          // Hide link for other languages where we don't have a specific guide yet
+                          link.style.display = 'none';
+                      }
+                  }
+              }
+          }
+      }
+  });
+
 });
