@@ -14,7 +14,9 @@
     "excludeText": "No redirigir automàticament aquest web",
     "manageExclusionsText": "Gestionar webs exclosos",
     "noExclusionsText": "Cap web exclòs",
-    "browserLangWarn": "⚠️ Detectem que no tens el navegador en català. Això afecta negativament al pes de la llengua a Internet. Saps per què?",
+    "browserLangWarn": "⚠️ Hem detectat que no tens el navegador configurat en català. Això afecta negativament al pes de la llengua a Internet. Saps per què?",
+    "browserLangMoreInfo": "Més informació",
+    "browserLangSolution": "Solució",
     "iconSource": "assets/img/icons/logo_ca.png"
   },
   "gl": {
@@ -33,6 +35,8 @@
     "manageExclusionsText": "Xestionar webs excluídas",
     "noExclusionsText": "Ningunha web excluída",
     "browserLangWarn": "⚠️ O teu navegador non está configurado en galego. Configurao para contar dixitalmente.",
+    "browserLangMoreInfo": "Máis información",
+    "browserLangSolution": "Solución",
     "iconSource": "assets/img/icons/logo_gl.png"
   },
   "eu": {
@@ -51,6 +55,8 @@
     "manageExclusionsText": "Kudeatu baztertutako webguneak",
     "noExclusionsText": "Ez da webgunerik baztertu",
     "browserLangWarn": "⚠️ Zure nabigatzailea ez dago euskaraz konfiguratuta.",
+    "browserLangMoreInfo": "Informazio gehiago",
+    "browserLangSolution": "Konponbidea",
     "iconSource": "assets/img/icons/logo_eu.png"
   }
 }
