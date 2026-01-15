@@ -183,23 +183,59 @@ function checkAndRedirect(attempt = 1) {
 
         // 1.7. Strategy Text Content (Fallback for missing metadata)
         // Busca enllaços que es diguin exactament "Català", "Galego", etc.
+        // MODIFICAT: Prioritzem "Català" per sobre de "Valencià" si tots dos existeixen.
         if (!url) {
              const allLinks = document.querySelectorAll('a');
-             const targetTexts = [];
-             if (simplePreferred === 'ca') targetTexts.push('català', 'valencià', 'cat');
-             if (simplePreferred === 'gl') targetTexts.push('galego', 'gal');
-             if (simplePreferred === 'eu') targetTexts.push('euskara', 'eus', 'euskera');
              
+             let highPriorityTexts = [];
+             let lowPriorityTexts = [];
+
+             if (simplePreferred === 'ca') {
+                 highPriorityTexts = ['català', 'cat'];
+                 lowPriorityTexts = ['valencià'];
+             } else if (simplePreferred === 'gl') {
+                  highPriorityTexts = ['galego', 'gal'];
+             } else if (simplePreferred === 'eu') {
+                  highPriorityTexts = ['euskara', 'eus', 'euskera'];
+             }
+
+             const allTargetTexts = [...highPriorityTexts, ...lowPriorityTexts];
+             let bestMatchUrl = null;
+             let matchPriority = 0; // 0=none, 1=low, 2=high
+
              for (const link of allLinks) {
                  const text = link.textContent.trim().toLowerCase();
+                 
                  // Evitem falsos positius verificant que el text sigui curt (només l'idioma)
-                 if (targetTexts.includes(text)) {
+                 if (allTargetTexts.includes(text)) {
                      if (link.href && !link.href.startsWith('javascript') && !link.href.includes('#')) {
-                         console.log(`Auto Language Redirector: Found link by text "${text}": ${link.href}`);
-                         url = link.href;
-                         break;
+                         
+                         let currentPriority = 0;
+                         if (highPriorityTexts.includes(text)) {
+                             currentPriority = 2;
+                         } else if (lowPriorityTexts.includes(text)) {
+                             currentPriority = 1;
+                         }
+
+                         // Si trobem una coincidència millor que l'actual, l'agafem.
+                         if (currentPriority > matchPriority) {
+                             bestMatchUrl = link.href;
+                             matchPriority = currentPriority;
+                             
+                             // Si ja hem trobat una de prioritat màxima (Català), parem. 
+                             // Assumim que el primer "Català" que trobem és el bo (header sol anar abans que footer).
+                             if (matchPriority === 2) {
+                                 console.log(`Auto Language Redirector: Found HIGH PRIORITY link by text "${text}": ${link.href}`);
+                                 break;
+                             }
+                             console.log(`Auto Language Redirector: Found LOW PRIORITY link by text "${text}": ${link.href}`);
+                         }
                      }
                  }
+             }
+
+             if (bestMatchUrl) {
+                 url = bestMatchUrl;
              }
         }
 
