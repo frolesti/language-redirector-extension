@@ -17,7 +17,7 @@ $browsers = if ($Browser -eq "all") {
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-function Create-Zip-Normalized {
+function New-ZipNormalized {
     param(
         [string]$SourceDirectory,
         [string]$DestinationFile
@@ -173,10 +173,16 @@ foreach ($lang in $languages) {
     if (-not (Test-Path $tempIconsDir)) { New-Item -ItemType Directory -Path $tempIconsDir -Force | Out-Null }
     
     $iconSource = $cfg.iconSource
+    $iconDisabledSource = $cfg.iconDisabledSource
     if (-not (Test-Path $iconSource)) {
         Write-Warning "Icon source $iconSource not found for $lang"
     } else {
         Update-Icon -SourcePath $iconSource -DestPath "$tempIconsDir/logo.png"
+    }
+    if ($iconDisabledSource -and (Test-Path $iconDisabledSource)) {
+        Update-Icon -SourcePath $iconDisabledSource -DestPath "$tempIconsDir/logo_disabled.png"
+    } elseif (Test-Path $iconSource) {
+        # Fallback: grayscale if no explicit disabled icon
         Update-Icon -SourcePath $iconSource -DestPath "$tempIconsDir/logo_disabled.png" -Grayscale
     }
 
@@ -199,8 +205,24 @@ foreach ($lang in $languages) {
         Copy-Item "src/background.js" -Destination "$targetDir/src/background.js"
         Copy-Item "src/popup/popup.css" -Destination "$targetDir/src/popup/popup.css"
         
-        # Copy Icons
+        # Copy Icons (PNG for manifest + SVG logo for popup)
         Copy-Item "$tempIconsDir/*" -Destination "$targetDir/icons/"
+        Copy-Item "assets/img/icons/logo.svg" -Destination "$targetDir/icons/logo.svg"
+        if (Test-Path "assets/img/icons/logo_disabled.svg") {
+            Copy-Item "assets/img/icons/logo_disabled.svg" -Destination "$targetDir/icons/logo_disabled.svg"
+        }
+        if (Test-Path "assets/img/icons/logo_configura.png") {
+            Copy-Item "assets/img/icons/logo_configura.png" -Destination "$targetDir/icons/logo_configura.png"
+        }
+        if (Test-Path "assets/img/icons/configura_on.png") {
+            Copy-Item "assets/img/icons/configura_on.png" -Destination "$targetDir/icons/configura_on.png"
+        }
+        if (Test-Path "assets/img/icons/configura_off.png") {
+            Copy-Item "assets/img/icons/configura_off.png" -Destination "$targetDir/icons/configura_off.png"
+        }
+        if (Test-Path "assets/img/icons/configura_logo.svg") {
+            Copy-Item "assets/img/icons/configura_logo.svg" -Destination "$targetDir/icons/configura_logo.svg"
+        }
 
         # Process Manifest
         $manifestTemplate = Get-ManifestTemplate -BrowserName $browser
@@ -246,7 +268,7 @@ foreach ($lang in $languages) {
         if (Test-Path $zipName) { Remove-Item $zipName }
         
         # Use custom function instead of Compress-Archive to enforce forward slashes
-        Create-Zip-Normalized -SourceDirectory $targetDir -DestinationFile $zipName
+        New-ZipNormalized -SourceDirectory $targetDir -DestinationFile $zipName
         
         Write-Host "Created $zipName"
     }

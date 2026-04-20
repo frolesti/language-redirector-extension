@@ -5,7 +5,7 @@ function checkAndRedirect(attempt = 1) {
   chrome.storage.local.get(['isEnabled', 'excludedDomains'], function(result) {
     // Gestió d'errors de lectura (defensa contra errors a Firefox)
     if (chrome.runtime.lastError) {
-      console.warn('Auto Language Redirector: Error llegint configuració:', chrome.runtime.lastError);
+      // console.warn('Auto Language Redirector: Error llegint configuració:', chrome.runtime.lastError);
       // Si falla, continuem assumint que està activat
       result = { isEnabled: true, excludedDomains: [] };
     }
@@ -26,13 +26,13 @@ function checkAndRedirect(attempt = 1) {
     );
 
     if (isExcluded) {
-        console.log(`Auto Language Redirector: Domain ${hostname} is excluded (matched: ${excludedList.find(d => hostname === d || hostname.endsWith('.' + d))}). Skipping.`);
+        // console.log(`Auto Language Redirector: Domain ${hostname} is excluded (matched: ${excludedList.find(d => hostname === d || hostname.endsWith('.' + d))}). Skipping.`);
         return;
     }
 
     // Si està desactivat explícitament, no fem res
     if (result.isEnabled === false) {
-        console.log('Auto Language Redirector: Extensió desactivada per l\'usuari.');
+        // console.log('Auto Language Redirector: Extensió desactivada per l\'usuari.');
         return;
     }
 
@@ -53,7 +53,7 @@ function checkAndRedirect(attempt = 1) {
     }
 
     if (redirectCount >= MAX_REDIRECTS) {
-        console.log('Auto Language Redirector: Too many redirects detected. Pausing for safety.');
+        // console.log('Auto Language Redirector: Too many redirects detected. Pausing for safety.');
         
         // Show UI Warning
         const warningDiv = document.createElement('div');
@@ -88,7 +88,7 @@ function checkAndRedirect(attempt = 1) {
 
     // L'idioma ve definit pel build (hardcoded per a cada versió de l'extensió)
     const preferredLang = '{{PREFERRED_LANGUAGE}}';
-    console.log(`Auto Language Redirector (Attempt ${attempt}): Preferred=${preferredLang}`);
+    // console.log(`Auto Language Redirector (Attempt ${attempt}): Preferred=${preferredLang}`);
 
     // Obtenim l'idioma actual de la pàgina (atribut lang del tag html)
     const currentLang = document.documentElement.lang || '';
@@ -103,14 +103,27 @@ function checkAndRedirect(attempt = 1) {
     // We should STOP to avoid loops.
     const urlHasLang = window.location.pathname.split('/').map(s => s.toLowerCase()).includes(simplePreferred);
     if (urlHasLang && simpleCurrent !== simplePreferred) {
-         console.log('Auto Language Redirector: URL contains preferred lang but content does not. Site might be misconfigured. Stopping to avoid loop.');
+         // console.log('Auto Language Redirector: URL contains preferred lang but content does not. Site might be misconfigured. Stopping to avoid loop.');
          return;
     }
 
     // Si ja estem en l'idioma preferit, no fem res.
     if (simpleCurrent === simplePreferred) {
-        console.log('Auto Language Redirector: Already in preferred language.');
-        return;
+        // EXCEPCIÓ CRÍTICA (Agencia Tributaria i similars):
+        // 'ca' (Català general) vs 'ca-valencia' (Valencià).
+        // L'extensió normalitza 'ca-valencia' a 'ca', per la qual cosa es pensa que ja hem acabat.
+        // Si estem en 'ca-valencia' però l'usuari vol 'ca' (i no estem en mode exclusivament valencià),
+        // hem de permetre continuar per buscar una versió "més" catalana (ca sense cognoms).
+        const isValencian = (currentLang.toLowerCase() === 'ca-valencia' || currentLang.toLowerCase().includes('-valencia') || currentLang.toLowerCase().includes('_valencia'));
+        const wantsStrictCatalan = (simplePreferred === 'ca' && !preferredLang.toLowerCase().includes('valencia'));
+
+        if (wantsStrictCatalan && isValencian) {
+             logDebug(`Detected Valencian variant ("${currentLang}"). User prefers standard Catalan. Continuing search for strict match...`);
+             // Continuem l'execució (no fem return)
+        } else {
+             logDebug('Already in preferred language.');
+             return;
+        }
     }
 
     let targetUrl = null;
@@ -183,23 +196,61 @@ function checkAndRedirect(attempt = 1) {
 
         // 1.7. Strategy Text Content (Fallback for missing metadata)
         // Busca enllaços que es diguin exactament "Català", "Galego", etc.
+        // MODIFICAT: Prioritzem "Català" per sobre de "Valencià" si tots dos existeixen.
         if (!url) {
              const allLinks = document.querySelectorAll('a');
-             const targetTexts = [];
-             if (simplePreferred === 'ca') targetTexts.push('català', 'valencià', 'cat');
-             if (simplePreferred === 'gl') targetTexts.push('galego', 'gal');
-             if (simplePreferred === 'eu') targetTexts.push('euskara', 'eus', 'euskera');
              
+             let highPriorityTexts = [];
+             let lowPriorityTexts = [];
+
+             if (simplePreferred === 'ca') {
+                 highPriorityTexts = ['català', 'cat'];
+                 lowPriorityTexts = ['valencià'];
+             } else if (simplePreferred === 'gl') {
+                  highPriorityTexts = ['galego', 'gal'];
+             } else if (simplePreferred === 'eu') {
+                  highPriorityTexts = ['euskara', 'eus', 'euskera'];
+             }
+
+             const allTargetTexts = [...highPriorityTexts, ...lowPriorityTexts];
+             let bestMatchUrl = null;
+             let matchPriority = 0; // 0=none, 1=low, 2=high
+
              for (const link of allLinks) {
                  const text = link.textContent.trim().toLowerCase();
+                 
                  // Evitem falsos positius verificant que el text sigui curt (només l'idioma)
-                 if (targetTexts.includes(text)) {
+                 if (allTargetTexts.includes(text)) {
                      if (link.href && !link.href.startsWith('javascript') && !link.href.includes('#')) {
-                         console.log(`Auto Language Redirector: Found link by text "${text}": ${link.href}`);
-                         url = link.href;
-                         break;
+                         
+                         logDebug(`DEBUG - Analyzing candidate: "${text}" -> ${link.href}`);
+
+                         let currentPriority = 0;
+                         if (highPriorityTexts.includes(text)) {
+                             currentPriority = 2;
+                         } else if (lowPriorityTexts.includes(text)) {
+                             currentPriority = 1;
+                         }
+
+                         // Si trobem una coincidència millor que l'actual, l'agafem.
+                         if (currentPriority > matchPriority) {
+                             bestMatchUrl = link.href;
+                             matchPriority = currentPriority;
+                             
+                             // Si ja hem trobat una de prioritat màxima (Català), parem. 
+                             // Assumim que el primer "Català" que trobem és el bo (header sol anar abans que footer).
+                             if (matchPriority === 2) {
+                                 logDebug(`Found HIGH PRIORITY link by text "${text}": ${link.href}`);
+                                 break;
+                             }
+                             logDebug(`Found LOW PRIORITY link by text "${text}": ${link.href}`);
+                         }
                      }
                  }
+             }
+
+             if (bestMatchUrl) {
+                 url = bestMatchUrl;
              }
         }
 
@@ -285,7 +336,7 @@ function checkAndRedirect(attempt = 1) {
             const isTranslated = cookies.includes('googtrans=') && cookies.includes(`/${simplePreferred}`);
 
             if (!isTranslated) {
-                console.log('Auto Language Redirector: Widget detected. Clicking...');
+                // console.log('Auto Language Redirector: Widget detected. Clicking...');
                 // Increment redirect count before clicking widget (which causes reload/redirect)
                 sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
                 sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
@@ -305,7 +356,7 @@ function checkAndRedirect(attempt = 1) {
         const isFalseFriend = simplePreferred === 'ca' && FALSE_FRIENDS_CA.some(domain => window.location.hostname.includes(domain));
 
         if (isFalseFriend) {
-             console.log('Auto Language Redirector: Domain is a False Friend (uses /ca/ for Canada). Attempting Generalized Nested Strategy...');
+             // console.log('Auto Language Redirector: Domain is a False Friend (uses /ca/ for Canada). Attempting Generalized Nested Strategy...');
              
              let nestedUrl = null;
              const currentPath = window.location.pathname;
@@ -341,7 +392,7 @@ function checkAndRedirect(attempt = 1) {
                     const u = new URL(window.location.href);
                     u.pathname = newPath;
                     nestedUrl = u.href;
-                    console.log(`Auto Language Redirector: Generalized Nested Strategy proposed: ${nestedUrl}`);
+                    // console.log(`Auto Language Redirector: Generalized Nested Strategy proposed: ${nestedUrl}`);
                  }
              }
 
@@ -350,16 +401,16 @@ function checkAndRedirect(attempt = 1) {
                  fetch(nestedUrl, { method: 'HEAD', redirect: 'manual' })
                     .then(response => {
                         if (response.ok && response.status === 200) {
-                             console.log(`Auto Language Redirector: Nested URL verified. Redirecting...`);
+                             // console.log(`Auto Language Redirector: Nested URL verified. Redirecting...`);
                              sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
                              sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
                              window.location.href = nestedUrl;
                         } else {
-                             console.log('Auto Language Redirector: Nested URL invalid or redirecting. Skipping.');
+                             // console.log('Auto Language Redirector: Nested URL invalid or redirecting. Skipping.');
                         }
-                    }).catch(e => console.log('Verification failed', e));
+                    }).catch(e => {/* console.log('Verification failed', e) */});
              } else {
-                console.log('Auto Language Redirector: No valid generalized nested path found for False Friend.');
+                // console.log('Auto Language Redirector: No valid generalized nested path found for False Friend.');
              }
         } else {
             try {
@@ -419,7 +470,7 @@ function checkAndRedirect(attempt = 1) {
             }
 
             if (potentialUrl) {
-                console.log('Auto Language Redirector: Deduced URL: ' + potentialUrl);
+                // console.log('Auto Language Redirector: Deduced URL: ' + potentialUrl);
                 
                 // Verifiquem si la URL existeix abans de redirigir (HEAD request)
                 // IMPORTANT: Comprovem que no sigui una redirecció (3xx) que ens torni a la pàgina original
@@ -429,16 +480,16 @@ function checkAndRedirect(attempt = 1) {
                         // Si rebem un 301/302 (type 'opaqueredirect' o status 3xx), vol dir que la URL redirigeix.
                         // En aquest cas, NO hem de redirigir nosaltres, perquè podríem causar un bucle.
                         if (response.ok && response.status === 200) {
-                            console.log(`Auto Language Redirector: URL verified (${response.status}). Redirecting...`);
+                            // console.log(`Auto Language Redirector: URL verified (${response.status}). Redirecting...`);
                             // Increment redirect count before redirecting
                             sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
                             sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
                             
                             window.location.href = potentialUrl;
                         } else if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
-                             console.log(`Auto Language Redirector: URL redirects (${response.status}). Avoiding loop.`);
+                             // console.log(`Auto Language Redirector: URL redirects (${response.status}). Avoiding loop.`);
                         } else {
-                            console.log(`Auto Language Redirector: URL invalid (${response.status}).`);
+                            // console.log(`Auto Language Redirector: URL invalid (${response.status}).`);
                             
                             // START STRATEGY: REMOVE LANGUAGE SEGMENT (Root Fallback)
                             // Valid for sites where Root is default Lang (e.g. irta.cat: /es/ -> / )
@@ -454,11 +505,11 @@ function checkAndRedirect(attempt = 1) {
                                          const removalUrl = rawUrl.href;
                                          
                                          if (removalUrl !== window.location.href) {
-                                             console.log(`Auto Language Redirector: Attempting Removal Strategy: ${removalUrl}`);
+                                             // console.log(`Auto Language Redirector: Attempting Removal Strategy: ${removalUrl}`);
                                              fetch(removalUrl, { method: 'HEAD', redirect: 'manual' })
                                                 .then(res2 => {
                                                     if (res2.ok && res2.status === 200) {
-                                                         console.log(`Auto Language Redirector: Removal URL verified. Redirecting...`);
+                                                         // console.log(`Auto Language Redirector: Removal URL verified. Redirecting...`);
                                                          sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
                                                          sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
                                                          window.location.href = removalUrl;
@@ -466,7 +517,7 @@ function checkAndRedirect(attempt = 1) {
                                                 }).catch(() => {});
                                          }
                                     }
-                                } catch (err) { console.error(err); }
+                                } catch (err) { /* console.error(err); */ }
                             }
 
                             // Start GENERALIZED Fallback for News/Broken Sites (Issue 1)
@@ -497,21 +548,78 @@ function checkAndRedirect(attempt = 1) {
                         }
                     })
                     .catch(err => {
-                        console.log('Auto Language Redirector: Error verifying URL.', err);
+                        // console.log('Auto Language Redirector: Error verifying URL.', err);
                     });
             } else {
-                // Retry logic if no URL found and attempts < 3
-                if (attempt < 3) {
-                    console.log(`Auto Language Redirector: No target found. Retrying in 1s (Attempt ${attempt + 1})...`);
-                    setTimeout(() => checkAndRedirect(attempt + 1), 1000);
+                // Strategy 4: Root Path Probe (Generic)
+                // If we are at the homepage and haven't found a target, try appending the preferred language code (e.g. /ca/).
+                let probeLaunched = false;
+                const isRoot = window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname === '/index.php';
+                
+                if (isRoot) {
+                     const probeUrl = window.location.origin + '/' + simplePreferred + '/';
+                     // console.log(`Auto Language Redirector: Probing root path: ${probeUrl}`);
+                     
+                     probeLaunched = true;
+                     // Use GET instead of HEAD to validate content, not just status code
+                     fetch(probeUrl, { redirect: 'manual' })
+                        .then(response => {
+                            if (response.ok && response.status === 200) {
+                                // Validate that the page actually exists by checking content
+                                return response.text().then(html => {
+                                    // Check for common 404 indicators in the HTML
+                                    const is404Page = html.toLowerCase().includes('page not found') ||
+                                                     html.toLowerCase().includes('404') ||
+                                                     html.toLowerCase().includes('not found') ||
+                                                     html.toLowerCase().includes('página no encontrada') ||
+                                                     html.toLowerCase().includes('pàgina no trobada') ||
+                                                     html.toLowerCase().includes('oops');
+                                    
+                                    // Check if lang attribute matches preferred language
+                                    const tempDiv = document.createElement('div');
+                                    tempDiv.innerHTML = html;
+                                    const htmlMatch = html.match(/<html[^>]*lang=["']([^"']+)["']/i);
+                                    const pageLang = htmlMatch ? htmlMatch[1].toLowerCase().split('-')[0] : '';
+                                    
+                                    if (!is404Page && pageLang === simplePreferred) {
+                                        // console.log(`Auto Language Redirector: Probe successful (validated content). Redirecting to ${probeUrl}`);
+                                        sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+                                        sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+                                        window.location.href = probeUrl;
+                                    } else {
+                                        // console.log(`Auto Language Redirector: Probe URL exists but content invalid (404 page or wrong lang: ${pageLang}). Skipping.`);
+                                        checkRetry();
+                                    }
+                                });
+                            } else {
+                                // Probe failed (404 etc), continue with retry logic
+                                checkRetry();
+                            }
+                        }).catch(e => {
+                             // console.log('Probe error', e);
+                             checkRetry();
+                        });
+                }
+                
+                function checkRetry() {
+                    if (attempt < 3) {
+                        // console.log(`Auto Language Redirector: No target found. Retrying in 1s (Attempt ${attempt + 1})...`);
+                        setTimeout(() => checkAndRedirect(attempt + 1), 1000);
+                    }
+                }
+
+                // If we didn't launch a probe, retry immediately
+                if (!probeLaunched) {
+                    checkRetry();
                 }
             }
         } catch (e) {
-            console.error("Error deducing URL:", e);
+            // console.error("Error deducing URL:", e);
         }
         } // End else !isFalseFriend
     } else if (targetUrl && targetUrl !== window.location.href) {
-      console.log('Auto Language Redirector: Target found via hreflang/lang. Redirecting to ' + targetUrl);
+      logDebug('Target found via hreflang/lang. Redirecting to ' + targetUrl);
+      saveLogsBeforeRedirect();
       window.location.href = targetUrl;
     }
   });

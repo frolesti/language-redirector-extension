@@ -2,10 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check both extension state and excluded domains
   chrome.storage.local.get(['preferredLanguage', 'isEnabled', 'excludedDomains'], (result) => {
       if (chrome.runtime.lastError) {
-        console.error('Error storage:', chrome.runtime.lastError);
-        result = {}; // Fallback
+        // console.error('Error storage:', chrome.runtime.lastError);
+        return;
       }
-      result = result || {};
 
       if (!result.preferredLanguage) {
           chrome.storage.local.set({ preferredLanguage: '{{PREFERRED_LANGUAGE}}' });
@@ -34,16 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       function updateLabel(state) {
-          // Aquests textos es reemplaçaran pel build script, però necessitem lògica JS per canviar-los dinàmicament
-          // Com que el template és estàtic, farem servir atributs de dades o variables globals injectades
-          // Per simplificar, farem servir els textos injectats directament aquí si és possible, 
-          // o millor, definim els textos en variables al principi del fitxer.
-          
-          // Solució: El build script reemplaçarà aquestes constants
           const textEnabled = "{{ENABLE_TEXT}}";
           const textDisabled = "{{DISABLE_TEXT}}";
           label.textContent = state ? textEnabled : textDisabled;
-          label.style.color = state ? '#D81E05' : '#777';
+          label.style.color = state ? '#F2EB6B' : 'rgba(255,255,255,0.45)';
       }
 
       // --- EXCLUSION LOGIC ---
@@ -181,14 +174,14 @@ document.addEventListener('DOMContentLoaded', () => {
                           }
                           
                           chrome.storage.local.set({ excludedDomains: newList }, () => {
-                              console.log('Updated excluded domains:', newList);
+                              // console.log('Updated excluded domains:', newList);
                               renderExclusionsList(newList); // Update list UI
                           });
                       });
                   });
 
               } catch (e) {
-                  console.error("Invalid URL", e);
+                  // console.error("Invalid URL", e);
                   excludeCheckbox.disabled = true;
               }
           } else {
