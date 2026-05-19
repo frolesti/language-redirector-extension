@@ -15,6 +15,7 @@ $browsers = if ($Browser -eq "all") {
 }
 
 Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 function New-ZipNormalized {
