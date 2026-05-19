@@ -41,6 +41,11 @@ function checkAndRedirect(attempt = 1) {
     const TIME_WINDOW = 10000; // 10 seconds
     const STORAGE_KEY_COUNT = 'alr_redirect_count';
     const STORAGE_KEY_TIME = 'alr_last_redirect_time';
+    // Per-host list of target URLs we have already attempted in this tab session.
+    // Protects against cookie-based language switchers (e.g. Verkami's /change_lang?lang=ca)
+    // that set a cookie and 302 back to the original URL without ever setting <html lang>,
+    // which would otherwise cause an infinite redirect loop.
+    const STORAGE_KEY_TARGETS = 'alr_attempted_targets_' + window.location.hostname;
 
     const now = Date.now();
     let redirectCount = parseInt(sessionStorage.getItem(STORAGE_KEY_COUNT) || '0');
@@ -50,6 +55,30 @@ function checkAndRedirect(attempt = 1) {
     if (now - lastRedirectTime > TIME_WINDOW) {
         redirectCount = 0;
         sessionStorage.setItem(STORAGE_KEY_COUNT, '0');
+        sessionStorage.removeItem(STORAGE_KEY_TARGETS);
+    }
+
+    // Centralized redirect helper. Returns true if the redirect was issued.
+    // - Increments the redirect counter (single source of truth, no double counting).
+    // - Tracks attempted target URLs per host to detect cookie-based switcher loops.
+    function performRedirect(url) {
+        if (!url || url === window.location.href) return false;
+
+        let attempted = [];
+        try { attempted = JSON.parse(sessionStorage.getItem(STORAGE_KEY_TARGETS) || '[]'); } catch (e) { attempted = []; }
+
+        if (attempted.indexOf(url) !== -1) {
+            console.log('Auto Language Redirector: Already attempted redirect to ' + url + ' in this session. Aborting to avoid loop (likely cookie-based language switcher).');
+            return false;
+        }
+
+        attempted.push(url);
+        sessionStorage.setItem(STORAGE_KEY_TARGETS, JSON.stringify(attempted));
+        sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
+        sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+
+        window.location.href = url;
+        return true;
     }
 
     if (redirectCount >= MAX_REDIRECTS) {
@@ -142,9 +171,7 @@ function checkAndRedirect(attempt = 1) {
         });
 
         if (url) {
-            // Increment redirect count before redirecting
-            sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
-            sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+            // Counter is incremented centrally by performRedirect().
             return url;
         }
 
@@ -158,9 +185,7 @@ function checkAndRedirect(attempt = 1) {
         });
         
         if (url) {
-            // Increment redirect count before redirecting
-            sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
-            sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
+            // Counter is incremented centrally by performRedirect().
             return url;
         }
         
@@ -387,9 +412,7 @@ function checkAndRedirect(attempt = 1) {
                     .then(response => {
                         if (response.ok && response.status === 200) {
                              console.log(`Auto Language Redirector: Nested URL verified. Redirecting...`);
-                             sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
-                             sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
-                             window.location.href = nestedUrl;
+                             performRedirect(nestedUrl);
                         } else {
                              console.log('Auto Language Redirector: Nested URL invalid or redirecting. Skipping.');
                         }
@@ -466,11 +489,7 @@ function checkAndRedirect(attempt = 1) {
                         // En aquest cas, NO hem de redirigir nosaltres, perquè podríem causar un bucle.
                         if (response.ok && response.status === 200) {
                             console.log(`Auto Language Redirector: URL verified (${response.status}). Redirecting...`);
-                            // Increment redirect count before redirecting
-                            sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
-                            sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
-                            
-                            window.location.href = potentialUrl;
+                            performRedirect(potentialUrl);
                         } else if (response.type === 'opaqueredirect' || (response.status >= 300 && response.status < 400)) {
                              console.log(`Auto Language Redirector: URL redirects (${response.status}). Avoiding loop.`);
                         } else {
@@ -495,9 +514,7 @@ function checkAndRedirect(attempt = 1) {
                                                 .then(res2 => {
                                                     if (res2.ok && res2.status === 200) {
                                                          console.log(`Auto Language Redirector: Removal URL verified. Redirecting...`);
-                                                         sessionStorage.setItem(STORAGE_KEY_COUNT, (redirectCount + 1).toString());
-                                                         sessionStorage.setItem(STORAGE_KEY_TIME, Date.now().toString());
-                                                         window.location.href = removalUrl;
+                                                         performRedirect(removalUrl);
                                                     }
                                                 }).catch(() => {});
                                          }
@@ -548,7 +565,7 @@ function checkAndRedirect(attempt = 1) {
         } // End else !isFalseFriend
     } else if (targetUrl && targetUrl !== window.location.href) {
       console.log('Auto Language Redirector: Target found via hreflang/lang. Redirecting to ' + targetUrl);
-      window.location.href = targetUrl;
+      performRedirect(targetUrl);
     }
   });
 }
