@@ -81,10 +81,10 @@ body.ca, body.gl, body.eu { background: none; }
 
 .popup-title-brand .brand-o {
   display: inline-flex;
-  width: 0.88em;
-  height: 0.88em;
-  margin: 0 0.5px;
-  transform: translateY(0.8px);
+  width: 1.34em;
+  height: 0.86em;
+  margin: 0 1.2px;
+  transform: translateY(0.9px);
 }
 
 .popup-title-brand .brand-o svg {
@@ -197,7 +197,8 @@ body.ca .popup-title-brand {
   display: flex;
   gap: 5px;
   margin-top: 6px;
-  padding-left: 22px; /* align under the warning text, past the leading icon */
+  padding-left: 0;
+  justify-content: center;
 }
 
 .icon-btn {
