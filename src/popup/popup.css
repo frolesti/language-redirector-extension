@@ -149,6 +149,13 @@ body.ca, body.gl, body.eu { background: none; }
   gap: 8px 12px;
 }
 
+/* CA-only enhancements: dual lang-scope warning + author credits.
+   For Galego and Euskara the popup keeps its original look. */
+body:not(.ca) .lang-warning-scopes,
+body:not(.ca) .lang-warning-actions,
+body:not(.ca) .legacy-credit,
+body:not(.ca) .creator-credit { display: none !important; }
+
 .lang-warning-close {
   position: absolute;
   top: 4px;
