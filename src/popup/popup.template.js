@@ -216,11 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
-  // We can only directly read Chrome's accept-languages list. The Google
-  // Account language is a separate setting that the extension cannot read
-  // (no OAuth scopes here), so we show it as "unknown" and link the user
-  // to the right settings page.
+    // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
+    // Important: we can reliably detect only browser accept-languages.
+    // Google Account language cannot be read automatically from the extension
+    // without additional auth scopes/API integration.
   chrome.storage.local.get(['langWarnMinimized'], (storageResult) => {
     const isMinimized = storageResult.langWarnMinimized === true;
 
@@ -231,21 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstLang = languages[0].toLowerCase();
         const browserOk = firstLang.startsWith(targetLang);
 
-        // Update the "detected" labels regardless of state — useful when expanded.
-        const browserDetectedEl = document.getElementById('langBrowserDetected');
-        const accountDetectedEl = document.getElementById('langAccountDetected');
-        if (browserDetectedEl) {
-            browserDetectedEl.textContent = languages.join(', ');
-            browserDetectedEl.classList.toggle('lang-ok', browserOk);
-            browserDetectedEl.classList.toggle('lang-bad', !browserOk);
-        }
-        if (accountDetectedEl) {
-            // We genuinely cannot read this; tell the user honestly.
-            accountDetectedEl.textContent = 'cal comprovar-ho manualment';
-        }
+        // We can detect browser language but not Google account language.
+        const browserNeedsFix = !browserOk;
+        const accountNeedsFix = false;
 
-        // Only show the warning when the browser's first language doesn't match.
-        if (browserOk) return;
+        // If nothing is confirmed as misconfigured, do not show warning UI.
+        if (!browserNeedsFix && !accountNeedsFix) return;
 
         const container = document.getElementById('langWarningContainer');
         const contentBox = document.getElementById('langWarningContent');
@@ -279,6 +269,29 @@ document.addEventListener('DOMContentLoaded', () => {
             setUIState(false);
             chrome.storage.local.set({ langWarnMinimized: false });
         };
+
+        // Scope blocks: show only what is actually misconfigured.
+        const browserScopeRow = document.querySelector('.lang-scope-row[data-scope="browser"]');
+        const accountScopeRow = document.querySelector('.lang-scope-row[data-scope="account"]');
+
+        const browserDetectedEl = document.getElementById('langBrowserDetected');
+        const accountDetectedEl = document.getElementById('langAccountDetected');
+
+        if (browserScopeRow) {
+            browserScopeRow.style.display = browserNeedsFix ? 'flex' : 'none';
+        }
+        if (accountScopeRow) {
+            accountScopeRow.style.display = accountNeedsFix ? 'flex' : 'none';
+        }
+
+        if (browserDetectedEl) {
+            browserDetectedEl.textContent = languages.join(', ');
+            browserDetectedEl.classList.toggle('lang-ok', !browserNeedsFix);
+            browserDetectedEl.classList.toggle('lang-bad', browserNeedsFix);
+        }
+        if (accountDetectedEl) {
+            accountDetectedEl.textContent = 'cal comprovar-ho manualment';
+        }
 
         // Wire up links. chrome:// URLs cannot be opened via a normal
         // anchor click, so we intercept and use chrome.tabs.create.
@@ -319,21 +332,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (fixBrowserLink) {
-            fixBrowserLink.href = '#';
-            fixBrowserLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                openInternal(getBrowserLangSettingsUrl());
-            });
+            if (!browserNeedsFix) {
+                fixBrowserLink.style.display = 'none';
+            } else {
+                fixBrowserLink.style.display = '';
+                fixBrowserLink.href = '#';
+                fixBrowserLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openInternal(getBrowserLangSettingsUrl());
+                });
+            }
         }
 
         if (fixAccountLink) {
-            fixAccountLink.href = '#';
-            fixAccountLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                // Google Account language settings (works for any logged-in
-                // Google account). Opens in a new tab.
-                chrome.tabs.create({ url: 'https://myaccount.google.com/language' });
-            });
+            if (!accountNeedsFix) {
+                fixAccountLink.style.display = 'none';
+            } else {
+                fixAccountLink.style.display = '';
+                fixAccountLink.href = '#';
+                fixAccountLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Google Account language settings page.
+                    chrome.tabs.create({ url: 'https://myaccount.google.com/language' });
+                });
+            }
+        }
+
+        // If only browser scope is active, hide account info text completely.
+        const warningText = document.getElementById('langWarningText');
+        if (warningText && browserNeedsFix && !accountNeedsFix) {
+            warningText.textContent = '{{BROWSER_LANG_WARN}}';
         }
     });
   });
