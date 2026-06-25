@@ -22,8 +22,8 @@
     "creatorText": "Creat per",
     "creatorName": "Froilán Olesti",
     "creatorUrl": "https://frolesti.cat",
-    "iconSource": "assets/img/icons/logo_on.png",
-    "iconDisabledSource": "assets/img/icons/logo_off.png"
+    "iconSource": "assets/img/icons/logo_on_campaign.png",
+    "iconDisabledSource": "assets/img/icons/logo_off_campaign.png"
   },
   "gl": {
     "name": "En Galego Por Favor",
@@ -48,8 +48,8 @@
     "creatorText": "",
     "creatorName": "",
     "creatorUrl": "",
-    "iconSource": "assets/img/icons/logo_on.png",
-    "iconDisabledSource": "assets/img/icons/logo_off.png"
+    "iconSource": "assets/img/icons/logo_on_campaign.png",
+    "iconDisabledSource": "assets/img/icons/logo_off_campaign.png"
   },
   "eu": {
     "name": "Euskaraz Mesedez",
@@ -74,7 +74,7 @@
     "creatorText": "",
     "creatorName": "",
     "creatorUrl": "",
-    "iconSource": "assets/img/icons/logo_on.png",
-    "iconDisabledSource": "assets/img/icons/logo_off.png"
+    "iconSource": "assets/img/icons/logo_on_campaign.png",
+    "iconDisabledSource": "assets/img/icons/logo_off_campaign.png"
   }
 }
