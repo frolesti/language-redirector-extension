@@ -39,7 +39,7 @@ body {
   box-sizing: border-box;
   position: relative;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 /* No watermark behind content */
@@ -51,24 +51,61 @@ body.ca, body.gl, body.eu { background: none; }
 /* ---- Header ---- */
 .popup-header {
   background: var(--cfg-blue);
-  padding: 16px 16px 10px;
+  padding: 10px 16px 6px;
   text-align: center;
 }
 
-.popup-header h3 {
+.popup-title {
   margin: 0;
   color: var(--cfg-yellow);
   font-size: 15px;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.2;
   letter-spacing: 0.3px;
+}
+
+.popup-title-brand {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  color: var(--cfg-yellow);
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.popup-title-brand .brand-char {
+  display: inline-block;
+  transform: translateY(0.4px);
+}
+
+.popup-title-brand .brand-o {
+  display: inline-flex;
+  width: 0.88em;
+  height: 0.88em;
+  margin: 0 0.5px;
+  transform: translateY(0.8px);
+}
+
+.popup-title-brand .brand-o svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+body.ca .popup-title-text {
+  display: none;
+}
+
+body.ca .popup-title-brand {
+  display: inline-flex;
 }
 
 /* ---- Container ---- */
 .container {
   display: flex;
   flex-direction: column;
-  padding: 10px 16px 10px;
+  padding: 6px 16px 4px;
   background-color: var(--cfg-blue);
 }
 
@@ -76,9 +113,9 @@ body.ca, body.gl, body.eu { background: none; }
 .popup-desc {
   text-align: center;
   color: rgba(255, 255, 255, 0.92);
-  margin: 0 0 14px 0;
-  font-size: 0.92em;
-  line-height: 1.5;
+  margin: 0 0 10px 0;
+  font-size: 0.9em;
+  line-height: 1.4;
 }
 
 /* ---- Toggle Row ---- */
@@ -86,7 +123,7 @@ body.ca, body.gl, body.eu { background: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   gap: 10px;
 }
 
@@ -101,13 +138,13 @@ body.ca, body.gl, body.eu { background: none; }
   position: relative;
   background-color: rgba(242, 235, 107, 0.10);
   color: #ffffff;
-  padding: 12px 30px 12px 12px;
+  padding: 9px 28px 8px 10px;
   border: 1px solid rgba(242, 235, 107, 0.28);
   border-radius: 10px;
-  font-size: 0.88em;
+  font-size: 0.84em;
   text-align: left;
-  line-height: 1.5;
-  margin-bottom: 12px;
+  line-height: 1.4;
+  margin-bottom: 8px;
 }
 
 .lang-warning-full--info {
@@ -123,7 +160,7 @@ body.ca, body.gl, body.eu { background: none; }
 .warning-headline {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 }
 
 .warning-body {
@@ -133,7 +170,7 @@ body.ca, body.gl, body.eu { background: none; }
 
 .warning-icon {
   flex: 0 0 auto;
-  font-size: 1.1em;
+  font-size: 1em;
   line-height: 1.2;
   margin-top: 1px;
 }
@@ -144,33 +181,33 @@ body.ca, body.gl, body.eu { background: none; }
 .warning-title {
   color: #ffffff;
   font-weight: 600;
-  font-size: 1.02em;
-  line-height: 1.4;
+  font-size: 0.99em;
+  line-height: 1.35;
 }
 
 .warning-meta {
-  margin-top: 4px;
+  margin-top: 3px;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.88em;
-  line-height: 1.4;
+  font-size: 0.84em;
+  line-height: 1.3;
 }
 
 /* Flat icon-only action row */
 .warning-actions {
   display: flex;
-  gap: 6px;
-  margin-top: 10px;
-  padding-left: 26px; /* align under the warning text, past the leading icon */
+  gap: 5px;
+  margin-top: 6px;
+  padding-left: 22px; /* align under the warning text, past the leading icon */
 }
 
 .icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 22px;
+  height: 22px;
   padding: 0;
-  border-radius: 6px;
+  border-radius: 4px;
   color: var(--cfg-yellow);
   background: transparent;
   border: none;
@@ -189,8 +226,8 @@ body.ca, body.gl, body.eu { background: none; }
 
 .icon-btn .icon,
 .icon-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   display: block;
 }
 
@@ -234,18 +271,18 @@ body:not(.ca) .creator-credit { display: none !important; }
   display: none;
   background-color: rgba(242, 235, 107, 0.15);
   color: var(--cfg-yellow);
-  padding: 3px;
+  padding: 2px;
   border: 1px solid rgba(242, 235, 107, 0.3);
   border-radius: 8px;
   text-align: center;
   cursor: pointer;
-  font-size: 0.85em;
-  margin-bottom: 12px;
+  font-size: 0.8em;
+  margin-bottom: 8px;
 }
 
 /* ---- Exclusion Area ---- */
 .exclude-section {
-  margin-bottom: 14px;
+  margin-bottom: 8px;
   font-size: 0.92em;
   color: rgba(255, 255, 255, 0.85);
   text-align: left;
@@ -277,15 +314,15 @@ body:not(.ca) .creator-credit { display: none !important; }
 /* ---- Buttons ---- */
 button {
   border: none;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
   width: 100%;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 button:hover {
@@ -320,7 +357,7 @@ body.ca #donate { display: none; }
   font-weight: 400;
   box-shadow: none;
   border: 1px solid rgba(255,255,255,0.15);
-  padding: 6px 10px;
+  padding: 5px 10px;
   margin-top: 4px;
 }
 
@@ -330,20 +367,20 @@ body.ca #donate { display: none; }
 
 /* ---- Exclusions Manager ---- */
 .exclusions-manager {
-  margin-top: 8px;
+  margin-top: 6px;
   text-align: left;
-  padding: 8px 0 0;
+  padding: 6px 0 0;
   border-top: 1px solid rgba(255,255,255,0.12);
 }
 
 .exclusions-manager summary {
   cursor: pointer;
-  font-size: 0.88em;
+  font-size: 0.86em;
   color: rgba(255, 255, 255, 0.8);
   outline: none;
   user-select: none;
   font-weight: 500;
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .exclusions-manager summary:focus-visible {
@@ -434,7 +471,7 @@ input:checked + .slider:before {
 /* ---- Footer Credit ---- */
 .popup-footer {
   text-align: center;
-  padding: 6px 16px 8px;
+  padding: 12px 16px 14px;
   background-color: var(--cfg-blue);
 }
 
@@ -459,11 +496,11 @@ input:checked + .slider:before {
 
 /* Legacy / authorship credits below the configura.cat logo */
 .popup-footer .legacy-credit {
-  margin-top: 8px;
+  margin-top: 12px;
   font-size: 0.85em;
   font-style: italic;
   color: rgba(255, 255, 255, 0.75);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .popup-footer .legacy-credit:empty {
@@ -471,10 +508,10 @@ input:checked + .slider:before {
 }
 
 .popup-footer .creator-credit {
-  margin-top: 4px;
+  margin-top: 8px;
   font-size: 0.9em;
   color: rgba(255, 255, 255, 0.85);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .popup-footer .creator-link {

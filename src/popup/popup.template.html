@@ -9,7 +9,18 @@
 
   <!-- Header with title -->
   <div class="popup-header">
-    <h3>{{POPUP_TITLE}}</h3>
+    <h3 class="popup-title" aria-label="{{POPUP_TITLE}}">
+      <span class="popup-title-text">{{POPUP_TITLE}}</span>
+      <span class="popup-title-brand" aria-hidden="true">
+        <span class="brand-char">M</span>
+        <span class="brand-o">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="3" />
+          </svg>
+        </span>
+        <span class="brand-char">STRA</span>
+      </span>
+    </h3>
   </div>
 
   <div class="container">
