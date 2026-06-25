@@ -81,8 +81,8 @@ body.ca, body.gl, body.eu { background: none; }
 
 .popup-title-brand .brand-o {
   display: inline-flex;
-  width: 1.34em;
-  height: 0.86em;
+  width: 1.52em;
+  height: 0.96em;
   margin: 0 1.2px;
   transform: translateY(0.9px);
 }
@@ -205,8 +205,8 @@ body.ca .popup-title-brand {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border-radius: 4px;
   color: var(--cfg-yellow);
@@ -227,8 +227,8 @@ body.ca .popup-title-brand {
 
 .icon-btn .icon,
 .icon-btn svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   display: block;
 }
 
