@@ -217,151 +217,94 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
     // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
-    // Important: we can reliably detect only browser accept-languages.
-    // Google Account language cannot be read automatically from the extension
-    // without additional auth scopes/API integration.
-  chrome.storage.local.get(['langWarnMinimized'], (storageResult) => {
-    const isMinimized = storageResult.langWarnMinimized === true;
+    // We can reliably detect the browser language, but not the Google account
+    // language without extra auth/API work. So the popup shows:
+    // - Browser warning only when the browser is not configured in Catalan.
+    // - Google warning only on Chrome builds (always visible there).
+  chrome.storage.local.get(['langWarnMinimized', 'googleWarnMinimized'], (storageResult) => {
+    const browserWarnMinimized = storageResult.langWarnMinimized === true;
+    const googleWarnMinimized = storageResult.googleWarnMinimized === true;
 
     chrome.i18n.getAcceptLanguages((languages) => {
+        const buildBrowser = '{{BROWSER_NAME}}';
+        const isChromeBuild = buildBrowser === 'chrome';
         const targetLang = '{{PREFERRED_LANGUAGE}}';
         if (!languages || languages.length === 0) return;
 
         const firstLang = languages[0].toLowerCase();
-        const browserOk = firstLang.startsWith(targetLang);
+        const browserNeedsFix = !firstLang.startsWith(targetLang);
 
-        // We can detect browser language but not Google account language.
-        const browserNeedsFix = !browserOk;
-        const accountNeedsFix = false;
+        const browserContainer = document.getElementById('browserWarningContainer');
+        const browserContent = document.getElementById('browserWarningContent');
+        const browserMinimized = document.getElementById('browserWarningMinimized');
+        const browserClose = document.getElementById('closeBrowserWarning');
+        const browserDetected = document.getElementById('browserDetectedLang');
+        const browserFixLink = document.getElementById('langFixBrowserLink');
 
-        // If nothing is confirmed as misconfigured, do not show warning UI.
-        if (!browserNeedsFix && !accountNeedsFix) return;
+        if (browserContainer && browserContent && browserMinimized) {
+            if (browserNeedsFix) {
+                browserContainer.style.display = 'block';
+                browserContent.style.display = browserWarnMinimized ? 'none' : 'block';
+                browserMinimized.style.display = browserWarnMinimized ? 'block' : 'none';
 
-        const container = document.getElementById('langWarningContainer');
-        const contentBox = document.getElementById('langWarningContent');
-        const minimizedBox = document.getElementById('langWarningMinimized');
+                if (browserDetected) {
+                    browserDetected.textContent = languages.join(', ');
+                }
 
-        if (!container || !contentBox || !minimizedBox) return;
+                if (browserClose) {
+                    browserClose.onclick = () => {
+                        browserContent.style.display = 'none';
+                        browserMinimized.style.display = 'block';
+                        chrome.storage.local.set({ langWarnMinimized: true });
+                    };
+                }
 
-        container.style.display = 'block';
+                browserMinimized.onclick = () => {
+                    browserContent.style.display = 'block';
+                    browserMinimized.style.display = 'none';
+                    chrome.storage.local.set({ langWarnMinimized: false });
+                };
 
-        const setUIState = (minimized) => {
-            if (minimized) {
-                contentBox.style.display = 'none';
-                minimizedBox.style.display = 'block';
+                if (browserFixLink) {
+                    browserFixLink.href = 'https://configura.cat/aplicacions';
+                }
             } else {
-                contentBox.style.display = 'block';
-                minimizedBox.style.display = 'none';
+                browserContainer.style.display = 'none';
             }
-        };
-
-        setUIState(isMinimized);
-
-        const closeBtn = document.getElementById('closeLangWarning');
-        if (closeBtn) {
-            closeBtn.onclick = () => {
-                setUIState(true);
-                chrome.storage.local.set({ langWarnMinimized: true });
-            };
         }
 
-        minimizedBox.onclick = () => {
-            setUIState(false);
-            chrome.storage.local.set({ langWarnMinimized: false });
-        };
+        const googleContainer = document.getElementById('googleWarningContainer');
+        const googleContent = document.getElementById('googleWarningContent');
+        const googleMinimized = document.getElementById('googleWarningMinimized');
+        const googleClose = document.getElementById('closeGoogleWarning');
+        const googleFixLink = document.getElementById('langFixAccountLink');
 
-        // Scope blocks: show only what is actually misconfigured.
-        const browserScopeRow = document.querySelector('.lang-scope-row[data-scope="browser"]');
-        const accountScopeRow = document.querySelector('.lang-scope-row[data-scope="account"]');
+        if (googleContainer && googleContent && googleMinimized) {
+            if (isChromeBuild && targetLang === 'ca') {
+                googleContainer.style.display = 'block';
+                googleContent.style.display = googleWarnMinimized ? 'none' : 'block';
+                googleMinimized.style.display = googleWarnMinimized ? 'block' : 'none';
 
-        const browserDetectedEl = document.getElementById('langBrowserDetected');
-        const accountDetectedEl = document.getElementById('langAccountDetected');
+                if (googleClose) {
+                    googleClose.onclick = () => {
+                        googleContent.style.display = 'none';
+                        googleMinimized.style.display = 'block';
+                        chrome.storage.local.set({ googleWarnMinimized: true });
+                    };
+                }
 
-        if (browserScopeRow) {
-            browserScopeRow.style.display = browserNeedsFix ? 'flex' : 'none';
-        }
-        if (accountScopeRow) {
-            accountScopeRow.style.display = accountNeedsFix ? 'flex' : 'none';
-        }
+                googleMinimized.onclick = () => {
+                    googleContent.style.display = 'block';
+                    googleMinimized.style.display = 'none';
+                    chrome.storage.local.set({ googleWarnMinimized: false });
+                };
 
-        if (browserDetectedEl) {
-            browserDetectedEl.textContent = languages.join(', ');
-            browserDetectedEl.classList.toggle('lang-ok', !browserNeedsFix);
-            browserDetectedEl.classList.toggle('lang-bad', browserNeedsFix);
-        }
-        if (accountDetectedEl) {
-            accountDetectedEl.textContent = 'cal comprovar-ho manualment';
-        }
-
-        // Wire up links. chrome:// URLs cannot be opened via a normal
-        // anchor click, so we intercept and use chrome.tabs.create.
-        const moreInfoLink = document.getElementById('langMoreInfoLink');
-        const fixBrowserLink = document.getElementById('langFixBrowserLink');
-        const fixAccountLink = document.getElementById('langFixAccountLink');
-
-        // Per-browser settings URL. Detect by user agent. Firefox/Safari
-        // do not allow opening internal pages from extensions, so we fall
-        // back to a help URL.
-        function getBrowserLangSettingsUrl() {
-            const ua = navigator.userAgent.toLowerCase();
-            if (ua.includes('firefox')) {
-                return 'about:preferences#general';
-            }
-            if (ua.includes('edg/') || ua.includes('edge/')) {
-                return 'edge://settings/languages';
-            }
-            if (ua.includes('opr/') || ua.includes('opera')) {
-                return 'opera://settings/languages';
-            }
-            // Chrome, Brave, Ecosia, Vivaldi, etc.
-            return 'chrome://settings/languages';
-        }
-
-        function openInternal(url) {
-            // chrome.tabs.create supports chrome://, edge://, about:, etc.
-            chrome.tabs.create({ url });
-        }
-
-        if (targetLang === 'ca') {
-            if (moreInfoLink) {
-                moreInfoLink.href = 'https://configura.cat/';
-                moreInfoLink.target = '_blank';
-            }
-        } else if (moreInfoLink) {
-            moreInfoLink.style.display = 'none';
-        }
-
-        if (fixBrowserLink) {
-            if (!browserNeedsFix) {
-                fixBrowserLink.style.display = 'none';
+                if (googleFixLink) {
+                    googleFixLink.href = 'https://configura.cat/google';
+                }
             } else {
-                fixBrowserLink.style.display = '';
-                fixBrowserLink.href = '#';
-                fixBrowserLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    openInternal(getBrowserLangSettingsUrl());
-                });
+                googleContainer.style.display = 'none';
             }
-        }
-
-        if (fixAccountLink) {
-            if (!accountNeedsFix) {
-                fixAccountLink.style.display = 'none';
-            } else {
-                fixAccountLink.style.display = '';
-                fixAccountLink.href = '#';
-                fixAccountLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    // Google Account language settings page.
-                    chrome.tabs.create({ url: 'https://myaccount.google.com/language' });
-                });
-            }
-        }
-
-        // If only browser scope is active, hide account info text completely.
-        const warningText = document.getElementById('langWarningText');
-        if (warningText && browserNeedsFix && !accountNeedsFix) {
-            warningText.textContent = '{{BROWSER_LANG_WARN}}';
         }
     });
   });

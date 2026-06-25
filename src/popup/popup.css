@@ -110,58 +110,70 @@ body.ca, body.gl, body.eu { background: none; }
   margin-bottom: 12px;
 }
 
+.lang-warning-full--info {
+  background-color: rgba(242, 235, 107, 0.12);
+  border-color: rgba(242, 235, 107, 0.45);
+}
+
 .lang-warning-full a {
   color: var(--cfg-yellow);
   font-weight: 700;
   text-decoration: underline;
 }
 
-/* Detected-scope rows inside the warning */
-.lang-warning-scopes {
-  margin-top: 8px;
+.warning-headline {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 0.95em;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.warning-icon {
+  flex: 0 0 auto;
+  font-size: 1.05em;
+  line-height: 1.2;
+  margin-top: 1px;
+}
+
+.warning-meta {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.92em;
   line-height: 1.35;
 }
 
-.lang-warning-scopes .lang-scope-row {
-  display: flex;
-  align-items: baseline;
+.warning-action {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-}
-
-.lang-warning-scopes .lang-scope-title {
-  color: var(--cfg-yellow);
-  font-weight: 700;
-}
-
-.lang-warning-scopes .lang-scope-value {
-  color: rgba(255, 255, 255, 0.85);
-  font-family: 'Consolas', 'Courier New', monospace;
-  font-size: 0.9em;
-}
-
-.lang-warning-scopes .lang-scope-value.lang-ok {
-  color: #b7eb8f;
-}
-
-.lang-warning-scopes .lang-scope-value.lang-bad {
-  color: #ffb4a2;
-}
-
-.lang-warning-actions {
   margin-top: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
+  color: var(--cfg-yellow);
+  text-decoration: none;
+  font-weight: 700;
+  border: 1px solid rgba(242, 235, 107, 0.35);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: rgba(242, 235, 107, 0.08);
 }
 
-/* CA-only enhancements: dual lang-scope warning + author credits.
+.warning-action:hover,
+.warning-action:focus-visible {
+  background: rgba(242, 235, 107, 0.16);
+  text-decoration: none;
+}
+
+.warning-action-icon {
+  font-size: 0.95em;
+  line-height: 1;
+}
+
+/* Hide old Google/browser scope markup if any template remnants remain */
+.lang-warning-scopes {
+  display: none;
+}
+
+/* CA-only enhancements: browser warning + Google info + author credits.
    For Galego and Euskara the popup keeps its original look. */
-body:not(.ca) .lang-warning-scopes,
-body:not(.ca) .lang-warning-actions,
+body:not(.ca) #googleWarningContainer,
 body:not(.ca) .legacy-credit,
 body:not(.ca) .creator-credit { display: none !important; }
 

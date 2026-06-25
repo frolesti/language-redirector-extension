@@ -14,34 +14,38 @@
 
   <div class="container">
 
-    <!-- Browser Language Warning -->
-    <div id="langWarningContainer" style="display: none;">
-      <!-- Full Warning -->
-      <div id="langWarningContent" class="lang-warning-full">
-        <button id="closeLangWarning" class="lang-warning-close" title="Minimitzar">&times;</button>
-        <div id="langWarningText">{{BROWSER_LANG_WARN}}</div>
-        <div class="lang-warning-scopes">
-          <div class="lang-scope-row" data-scope="browser">
-            <span class="lang-scope-label">
-              <strong class="lang-scope-title">Navegador:</strong>
-              <span id="langBrowserDetected" class="lang-scope-value">—</span>
-            </span>
-          </div>
-          <div class="lang-scope-row" data-scope="account">
-            <span class="lang-scope-label">
-              <strong class="lang-scope-title">Compte Google:</strong>
-              <span id="langAccountDetected" class="lang-scope-value">no detectat</span>
-            </span>
-          </div>
+    <!-- Browser language warning -->
+    <div id="browserWarningContainer" style="display: none;">
+      <div id="browserWarningContent" class="lang-warning-full">
+        <button id="closeBrowserWarning" class="lang-warning-close" title="Minimitzar">&times;</button>
+        <div class="warning-headline">
+          <span class="warning-icon" aria-hidden="true">🌐</span>
+          <div id="browserWarningText">{{BROWSER_LANG_WARN}}</div>
         </div>
-        <div class="lang-warning-actions">
-          <a id="langMoreInfoLink" href="#">{{BROWSER_LANG_MORE_INFO}}</a>
-          <a id="langFixBrowserLink" href="#">{{BROWSER_LANG_SOLUTION_BROWSER}}</a>
-          <a id="langFixAccountLink" href="#">{{BROWSER_LANG_SOLUTION_ACCOUNT}}</a>
-        </div>
+        <div class="warning-meta" id="browserDetectedLang"></div>
+        <a id="langFixBrowserLink" class="warning-action" href="{{BROWSER_LANG_ACTION_URL}}" target="_blank" rel="noopener">
+          <span class="warning-action-icon" aria-hidden="true">↗</span>
+          <span>{{BROWSER_LANG_ACTION_LABEL}}</span>
+        </a>
       </div>
-      <!-- Minimized Warning -->
-      <div id="langWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">⚠️</div>
+      <div id="browserWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">🌐</div>
+    </div>
+
+    <!-- Google account language info (Chrome only) -->
+    <div id="googleWarningContainer" style="display: none;">
+      <div id="googleWarningContent" class="lang-warning-full lang-warning-full--info">
+        <button id="closeGoogleWarning" class="lang-warning-close" title="Minimitzar">&times;</button>
+        <div class="warning-headline">
+          <span class="warning-icon" aria-hidden="true">ℹ️</span>
+          <div id="googleWarningText">{{GOOGLE_LANG_WARN}}</div>
+        </div>
+        <div class="warning-meta">{{GOOGLE_LANG_META}}</div>
+        <a id="langFixAccountLink" class="warning-action" href="{{GOOGLE_LANG_ACTION_URL}}" target="_blank" rel="noopener">
+          <span class="warning-action-icon" aria-hidden="true">↗</span>
+          <span>{{GOOGLE_LANG_ACTION_LABEL}}</span>
+        </a>
+      </div>
+      <div id="googleWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">ℹ️</div>
     </div>
 
     <p class="popup-desc">{{POPUP_TEXT}}</p>

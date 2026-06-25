@@ -247,9 +247,12 @@ foreach ($lang in $languages) {
         $popupHtml = $popupHtml.Replace("{{EXCLUDE_TEXT}}", $cfg.excludeText)
         $popupHtml = $popupHtml.Replace("{{MANAGE_EXCLUSIONS_TEXT}}", $cfg.manageExclusionsText)
         $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_WARN}}", $cfg.browserLangWarn)
-        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_MORE_INFO}}", $cfg.browserLangMoreInfo)
-        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_SOLUTION_BROWSER}}", $cfg.browserLangSolutionBrowser)
-        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_SOLUTION_ACCOUNT}}", $cfg.browserLangSolutionAccount)
+        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_ACTION_LABEL}}", $cfg.browserLangActionLabel)
+        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_ACTION_URL}}", $cfg.browserLangActionUrl)
+        $popupHtml = $popupHtml.Replace("{{GOOGLE_LANG_WARN}}", $cfg.googleLangWarn)
+        $popupHtml = $popupHtml.Replace("{{GOOGLE_LANG_META}}", $cfg.googleLangMeta)
+        $popupHtml = $popupHtml.Replace("{{GOOGLE_LANG_ACTION_LABEL}}", $cfg.googleLangActionLabel)
+        $popupHtml = $popupHtml.Replace("{{GOOGLE_LANG_ACTION_URL}}", $cfg.googleLangActionUrl)
         $popupHtml = $popupHtml.Replace("{{LEGACY_NAME_TEXT}}", $cfg.legacyNameText)
         $popupHtml = $popupHtml.Replace("{{CREATOR_TEXT}}", $cfg.creatorText)
         $popupHtml = $popupHtml.Replace("{{CREATOR_NAME}}", $cfg.creatorName)
@@ -260,6 +263,7 @@ foreach ($lang in $languages) {
         # Process Popup JS
         $popupJs = Get-Content -Raw -Path "src/popup/popup.template.js" -Encoding UTF8
         $popupJs = $popupJs.Replace("{{PREFERRED_LANGUAGE}}", $cfg.preferredLanguage)
+        $popupJs = $popupJs.Replace("{{BROWSER_NAME}}", $browser)
         $popupJs = $popupJs.Replace("{{REPORT_SUBJECT}}", $cfg.reportSubject)
         $popupJs = $popupJs.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
         $popupJs = $popupJs.Replace("{{DISABLE_TEXT}}", $cfg.disableText)
