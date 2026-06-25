@@ -1,7 +1,7 @@
 ﻿param (
     [string]$Language = "all",
     [string]$Browser = "all",
-    [string]$Version = "1.9"
+    [string]$Version = "2.0.0"
 )
 
 $config = Get-Content -Raw -Path "config.json" -Encoding UTF8 | ConvertFrom-Json
@@ -96,21 +96,13 @@ function Update-Icon {
         $canvasSize = 128
         $iconSize = 128
 
-        # Calculate scaling.
-        # Aspect-preserving fit (min ratio) keeps the rounded pill ends but
-        # wastes ~50% of the canvas as transparent padding for the wide "on"
-        # logo, which makes the toolbar icon look tiny. We boost the fit
-        # ratio by a small factor so the pill fills more of the canvas at
-        # the cost of clipping a few pixels of the rounded caps; the "on"
-        # letters stay perfectly centered and intact.
+        # Aspect-preserving fit: the full pill (including rounded ends) must
+        # be visible. The 'on' logo is wide (~2:1), so there will be some
+        # transparent padding above/below in the 128x128 square canvas; this
+        # is the intended trade-off to keep the logo whole.
         $ratioX = $iconSize / $img.Width
         $ratioY = $iconSize / $img.Height
-        $fitRatio = [Math]::Min($ratioX, $ratioY)
-        $fillRatio = [Math]::Max($ratioX, $ratioY)
-        # 0.0 = pure fit (padded), 1.0 = pure fill (cropped). 0.35 keeps the
-        # pill silhouette readable while making the icon ~35% bigger.
-        $zoomBlend = 0.35
-        $ratio = $fitRatio + ($fillRatio - $fitRatio) * $zoomBlend
+        $ratio = [Math]::Min($ratioX, $ratioY)
 
         $newWidth = [int]($img.Width * $ratio)
         $newHeight = [int]($img.Height * $ratio)
