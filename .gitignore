@@ -3,3 +3,7 @@ build/
 *.zip
 assets/promo/ca/en catala siusplau/en catala siusplau.mp4
 assets/img/scripts
+
+# Local-only / private documents (subvencions, bases, drafts, etc.)
+private/
+.venv/

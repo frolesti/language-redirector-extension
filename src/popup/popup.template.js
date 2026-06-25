@@ -208,72 +208,123 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
+  // We can only directly read Chrome's accept-languages list. The Google
+  // Account language is a separate setting that the extension cannot read
+  // (no OAuth scopes here), so we show it as "unknown" and link the user
+  // to the right settings page.
   chrome.storage.local.get(['langWarnMinimized'], (storageResult) => {
     const isMinimized = storageResult.langWarnMinimized === true;
 
     chrome.i18n.getAcceptLanguages((languages) => {
         const targetLang = '{{PREFERRED_LANGUAGE}}';
-        if (languages && languages.length > 0) {
-            const firstLang = languages[0].toLowerCase();
-            // Check if the FIRST language matches the target (e.g., 'ca' or 'ca-es')
-            if (!firstLang.startsWith(targetLang)) {
-                
-                const container = document.getElementById('langWarningContainer');
-                const contentBox = document.getElementById('langWarningContent');
-                const minimizedBox = document.getElementById('langWarningMinimized');
-                
-                if (container && contentBox && minimizedBox) {
-                    container.style.display = 'block';
+        if (!languages || languages.length === 0) return;
 
-                    // Function to update UI based on state
-                    const setUIState = (minimized) => {
-                        if (minimized) {
-                            contentBox.style.display = 'none';
-                            minimizedBox.style.display = 'block';
-                        } else {
-                            contentBox.style.display = 'block';
-                            minimizedBox.style.display = 'none';
-                        }
-                    };
+        const firstLang = languages[0].toLowerCase();
+        const browserOk = firstLang.startsWith(targetLang);
 
-                    // Initial State
-                    setUIState(isMinimized);
-                    
-                    // Close button -> Minimize
-                    const closeBtn = document.getElementById('closeLangWarning');
-                    if (closeBtn) {
-                        closeBtn.onclick = () => {
-                            setUIState(true);
-                            chrome.storage.local.set({ langWarnMinimized: true });
-                        };
-                    }
+        // Update the "detected" labels regardless of state — useful when expanded.
+        const browserDetectedEl = document.getElementById('langBrowserDetected');
+        const accountDetectedEl = document.getElementById('langAccountDetected');
+        if (browserDetectedEl) {
+            browserDetectedEl.textContent = languages.join(', ');
+            browserDetectedEl.classList.toggle('lang-ok', browserOk);
+            browserDetectedEl.classList.toggle('lang-bad', !browserOk);
+        }
+        if (accountDetectedEl) {
+            // We genuinely cannot read this; tell the user honestly.
+            accountDetectedEl.textContent = 'cal comprovar-ho manualment';
+        }
 
-                    // Minimized strip -> Expand
-                    minimizedBox.onclick = () => {
-                        setUIState(false);
-                        chrome.storage.local.set({ langWarnMinimized: false });
-                    };
+        // Only show the warning when the browser's first language doesn't match.
+        if (browserOk) return;
 
-                    // Links Logic
-                    const moreInfoLink = document.getElementById('langMoreInfoLink');
-                    const fixLink = document.getElementById('langFixLink');
+        const container = document.getElementById('langWarningContainer');
+        const contentBox = document.getElementById('langWarningContent');
+        const minimizedBox = document.getElementById('langWarningMinimized');
 
-                    if (targetLang === 'ca') {
-                        if (moreInfoLink) {
-                            moreInfoLink.href = "https://configura.cat/";
-                            moreInfoLink.target = "_blank";
-                        }
-                        if (fixLink) {
-                            fixLink.href = "https://configura.cat/google";
-                            fixLink.target = "_blank";
-                        }
-                    } else {
-                        // Hide links for other languages if no URL available
-                        if (moreInfoLink) moreInfoLink.style.display = 'none';
-                        if (fixLink) fixLink.style.display = 'none';
-                    }
-                }
+        if (!container || !contentBox || !minimizedBox) return;
+
+        container.style.display = 'block';
+
+        const setUIState = (minimized) => {
+            if (minimized) {
+                contentBox.style.display = 'none';
+                minimizedBox.style.display = 'block';
+            } else {
+                contentBox.style.display = 'block';
+                minimizedBox.style.display = 'none';
             }
+        };
+
+        setUIState(isMinimized);
+
+        const closeBtn = document.getElementById('closeLangWarning');
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                setUIState(true);
+                chrome.storage.local.set({ langWarnMinimized: true });
+            };
+        }
+
+        minimizedBox.onclick = () => {
+            setUIState(false);
+            chrome.storage.local.set({ langWarnMinimized: false });
+        };
+
+        // Wire up links. chrome:// URLs cannot be opened via a normal
+        // anchor click, so we intercept and use chrome.tabs.create.
+        const moreInfoLink = document.getElementById('langMoreInfoLink');
+        const fixBrowserLink = document.getElementById('langFixBrowserLink');
+        const fixAccountLink = document.getElementById('langFixAccountLink');
+
+        // Per-browser settings URL. Detect by user agent. Firefox/Safari
+        // do not allow opening internal pages from extensions, so we fall
+        // back to a help URL.
+        function getBrowserLangSettingsUrl() {
+            const ua = navigator.userAgent.toLowerCase();
+            if (ua.includes('firefox')) {
+                return 'about:preferences#general';
+            }
+            if (ua.includes('edg/') || ua.includes('edge/')) {
+                return 'edge://settings/languages';
+            }
+            if (ua.includes('opr/') || ua.includes('opera')) {
+                return 'opera://settings/languages';
+            }
+            // Chrome, Brave, Ecosia, Vivaldi, etc.
+            return 'chrome://settings/languages';
+        }
+
+        function openInternal(url) {
+            // chrome.tabs.create supports chrome://, edge://, about:, etc.
+            chrome.tabs.create({ url });
+        }
+
+        if (targetLang === 'ca') {
+            if (moreInfoLink) {
+                moreInfoLink.href = 'https://configura.cat/';
+                moreInfoLink.target = '_blank';
+            }
+        } else if (moreInfoLink) {
+            moreInfoLink.style.display = 'none';
+        }
+
+        if (fixBrowserLink) {
+            fixBrowserLink.href = '#';
+            fixBrowserLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                openInternal(getBrowserLangSettingsUrl());
+            });
+        }
+
+        if (fixAccountLink) {
+            fixAccountLink.href = '#';
+            fixAccountLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Google Account language settings (works for any logged-in
+                // Google account). Opens in a new tab.
+                chrome.tabs.create({ url: 'https://myaccount.google.com/language' });
+            });
         }
     });
   });

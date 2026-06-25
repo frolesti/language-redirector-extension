@@ -245,7 +245,12 @@ foreach ($lang in $languages) {
         $popupHtml = $popupHtml.Replace("{{MANAGE_EXCLUSIONS_TEXT}}", $cfg.manageExclusionsText)
         $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_WARN}}", $cfg.browserLangWarn)
         $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_MORE_INFO}}", $cfg.browserLangMoreInfo)
-        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_SOLUTION}}", $cfg.browserLangSolution)
+        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_SOLUTION_BROWSER}}", $cfg.browserLangSolutionBrowser)
+        $popupHtml = $popupHtml.Replace("{{BROWSER_LANG_SOLUTION_ACCOUNT}}", $cfg.browserLangSolutionAccount)
+        $popupHtml = $popupHtml.Replace("{{LEGACY_NAME_TEXT}}", $cfg.legacyNameText)
+        $popupHtml = $popupHtml.Replace("{{CREATOR_TEXT}}", $cfg.creatorText)
+        $popupHtml = $popupHtml.Replace("{{CREATOR_NAME}}", $cfg.creatorName)
+        $popupHtml = $popupHtml.Replace("{{CREATOR_URL}}", $cfg.creatorUrl)
         $popupHtml = $popupHtml.Replace("{{LANG_CODE}}", $lang)
         Set-Content -Path "$targetDir/src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 

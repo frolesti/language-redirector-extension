@@ -107,6 +107,48 @@ body.ca, body.gl, body.eu { background: none; }
   text-decoration: underline;
 }
 
+/* Detected-scope rows inside the warning */
+.lang-warning-scopes {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.95em;
+  line-height: 1.35;
+}
+
+.lang-warning-scopes .lang-scope-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.lang-warning-scopes .lang-scope-title {
+  color: var(--cfg-yellow);
+  font-weight: 700;
+}
+
+.lang-warning-scopes .lang-scope-value {
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.lang-warning-scopes .lang-scope-value.lang-ok {
+  color: #b7eb8f;
+}
+
+.lang-warning-scopes .lang-scope-value.lang-bad {
+  color: #ffb4a2;
+}
+
+.lang-warning-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
 .lang-warning-close {
   position: absolute;
   top: 4px;
@@ -340,5 +382,35 @@ input:checked + .slider:before {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Legacy / authorship credits below the configura.cat logo */
+.popup-footer .legacy-credit {
+  margin-top: 6px;
+  font-size: 0.7em;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.3;
+}
+
+.popup-footer .legacy-credit:empty {
+  display: none;
+}
+
+.popup-footer .creator-credit {
+  margin-top: 2px;
+  font-size: 0.7em;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.3;
+}
+
+.popup-footer .creator-link {
+  color: var(--cfg-yellow);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.popup-footer .creator-link:hover {
+  text-decoration: underline;
 }
 
