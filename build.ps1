@@ -96,11 +96,22 @@ function Update-Icon {
         $canvasSize = 128
         $iconSize = 128
 
-        # Calculate scaling
+        # Calculate scaling.
+        # Aspect-preserving fit (min ratio) keeps the rounded pill ends but
+        # wastes ~50% of the canvas as transparent padding for the wide "on"
+        # logo, which makes the toolbar icon look tiny. We boost the fit
+        # ratio by a small factor so the pill fills more of the canvas at
+        # the cost of clipping a few pixels of the rounded caps; the "on"
+        # letters stay perfectly centered and intact.
         $ratioX = $iconSize / $img.Width
         $ratioY = $iconSize / $img.Height
-        $ratio = [Math]::Min($ratioX, $ratioY)
-        
+        $fitRatio = [Math]::Min($ratioX, $ratioY)
+        $fillRatio = [Math]::Max($ratioX, $ratioY)
+        # 0.0 = pure fit (padded), 1.0 = pure fill (cropped). 0.35 keeps the
+        # pill silhouette readable while making the icon ~35% bigger.
+        $zoomBlend = 0.35
+        $ratio = $fitRatio + ($fillRatio - $fitRatio) * $zoomBlend
+
         $newWidth = [int]($img.Width * $ratio)
         $newHeight = [int]($img.Height * $ratio)
 
@@ -257,7 +268,7 @@ foreach ($lang in $languages) {
         # Process Popup JS
         $popupJs = Get-Content -Raw -Path "src/popup/popup.template.js" -Encoding UTF8
         $popupJs = $popupJs.Replace("{{PREFERRED_LANGUAGE}}", $cfg.preferredLanguage)
-        $popupJs = $popupJs.Replace("{{REPORT_SUBJECT}}", [System.Uri]::EscapeDataString($cfg.reportSubject))
+        $popupJs = $popupJs.Replace("{{REPORT_SUBJECT}}", $cfg.reportSubject)
         $popupJs = $popupJs.Replace("{{ENABLE_TEXT}}", $cfg.enableText)
         $popupJs = $popupJs.Replace("{{DISABLE_TEXT}}", $cfg.disableText)
         $popupJs = $popupJs.Replace("{{NO_EXCLUSIONS_TEXT}}", $cfg.noExclusionsText)

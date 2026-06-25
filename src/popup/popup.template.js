@@ -199,11 +199,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botó de reportar error
+  // Botó de reportar error.
+  // Use Gmail's compose URL directly instead of mailto: — many browsers no
+  // longer have a default mail handler registered, so a plain mailto: opens
+  // an empty tab. The Gmail composer works regardless of OS/browser config
+  // for any user logged into a Google account (our main audience).
   const reportBtn = document.getElementById('report');
   if (reportBtn) {
     reportBtn.addEventListener('click', () => {
-      chrome.tabs.create({ url: 'mailto:suport.encatala@gmail.com?subject={{REPORT_SUBJECT}}' });
+      const to = 'suport.encatala@gmail.com';
+      const subject = '{{REPORT_SUBJECT}}';
+      const composeUrl = 'https://mail.google.com/mail/?view=cm&fs=1'
+        + '&to=' + encodeURIComponent(to)
+        + '&su=' + encodeURIComponent(subject);
+      chrome.tabs.create({ url: composeUrl });
     });
   }
 
