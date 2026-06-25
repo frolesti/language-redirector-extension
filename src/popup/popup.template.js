@@ -253,6 +253,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return names.slice(0, -1).join(', ') + ' i ' + names[names.length - 1];
         }
 
+        function getBrowserLangSettingsUrl(browser) {
+            switch ((browser || '').toLowerCase()) {
+                case 'chrome':  return 'chrome://settings/languages';
+                case 'edge':    return 'edge://settings/languages';
+                case 'brave':   return 'brave://settings/languages';
+                case 'opera':   return 'opera://settings/languages';
+                case 'ecosia':  return 'chrome://settings/languages';
+                case 'firefox': return 'about:preferences#general';
+                case 'safari':  return 'https://support.apple.com/guide/safari/change-the-language-ibrw1001/mac';
+                default:        return 'chrome://settings/languages';
+            }
+        }
+
+        function getBrowserDisplayName(browser) {
+            switch ((browser || '').toLowerCase()) {
+                case 'chrome':  return 'Chrome';
+                case 'edge':    return 'Edge';
+                case 'brave':   return 'Brave';
+                case 'opera':   return 'Opera';
+                case 'ecosia':  return 'Ecosia';
+                case 'firefox': return 'Firefox';
+                case 'safari':  return 'Safari';
+                default:        return 'el navegador';
+            }
+        }
+
         const browserContainer = document.getElementById('browserWarningContainer');
         const browserContent = document.getElementById('browserWarningContent');
         const browserMinimized = document.getElementById('browserWarningMinimized');
@@ -289,7 +315,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 if (browserFixLink) {
-                    browserFixLink.href = 'https://configura.cat/aplicacions';
+                    const browserSettingsUrl = getBrowserLangSettingsUrl(buildBrowser);
+                    browserFixLink.title = 'Obre la configuració d\'idioma de ' + getBrowserDisplayName(buildBrowser);
+                    browserFixLink.setAttribute('aria-label', browserFixLink.title);
+                    browserFixLink.onclick = (ev) => {
+                        ev.preventDefault();
+                        if (browserSettingsUrl.startsWith('http')) {
+                            chrome.tabs.create({ url: browserSettingsUrl });
+                        } else {
+                            // chrome://, edge://, about:, brave://, opera://
+                            // anchor href can't navigate to these; use tabs API
+                            chrome.tabs.create({ url: browserSettingsUrl });
+                        }
+                    };
                 }
             } else {
                 browserContainer.style.display = 'none';
@@ -328,7 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 if (googleFixLink) {
-                    googleFixLink.href = 'https://configura.cat/google';
+                    googleFixLink.href = 'https://myaccount.google.com/language';
+                    googleFixLink.target = '_blank';
+                    googleFixLink.rel = 'noopener';
                 }
             } else {
                 googleContainer.style.display = 'none';

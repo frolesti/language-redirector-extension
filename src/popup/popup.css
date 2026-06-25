@@ -99,97 +99,99 @@ body.ca, body.gl, body.eu { background: none; }
 /* ---- Warning ---- */
 .lang-warning-full {
   position: relative;
-  background-color: rgba(242, 235, 107, 0.15);
-  color: var(--cfg-yellow);
-  padding: 10px 28px 10px 10px;
-  border: 1px solid rgba(242, 235, 107, 0.3);
-  border-radius: 8px;
-  font-size: 0.8em;
+  background-color: rgba(242, 235, 107, 0.10);
+  color: #ffffff;
+  padding: 12px 30px 12px 12px;
+  border: 1px solid rgba(242, 235, 107, 0.28);
+  border-radius: 10px;
+  font-size: 0.88em;
   text-align: left;
-  line-height: 1.45;
+  line-height: 1.5;
   margin-bottom: 12px;
 }
 
 .lang-warning-full--info {
-  background-color: rgba(242, 235, 107, 0.12);
-  border-color: rgba(242, 235, 107, 0.45);
+  background-color: rgba(158, 208, 255, 0.08);
+  border-color: rgba(158, 208, 255, 0.35);
 }
 
 .lang-warning-full a {
   color: var(--cfg-yellow);
-  font-weight: 700;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .warning-headline {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
+}
+
+.warning-body {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .warning-icon {
   flex: 0 0 auto;
-  font-size: 1.05em;
+  font-size: 1.1em;
   line-height: 1.2;
   margin-top: 1px;
 }
 
-.warning-icon--alert {
-  color: #ffcf5a;
-}
+.warning-icon--alert { color: #ffcf5a; }
+.warning-icon--info  { color: #9ed0ff; }
 
-.warning-icon--info {
-  color: #9ed0ff;
+.warning-title {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.02em;
+  line-height: 1.4;
 }
 
 .warning-meta {
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.92em;
-  line-height: 1.35;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.88em;
+  line-height: 1.4;
 }
 
-.warning-action {
-  display: inline-flex;
-  align-items: center;
+/* Flat icon-only action row */
+.warning-actions {
+  display: flex;
   gap: 6px;
-  margin-top: 8px;
-  color: var(--cfg-yellow);
-  text-decoration: none;
-  font-weight: 700;
-  border: 1px solid rgba(242, 235, 107, 0.35);
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: rgba(242, 235, 107, 0.08);
-  position: relative;
+  margin-top: 10px;
+  padding-left: 26px; /* align under the warning text, past the leading icon */
 }
 
-.warning-action:hover,
-.warning-action:focus-visible {
-  background: rgba(242, 235, 107, 0.16);
-  text-decoration: none;
-}
-
-.warning-action-icon {
+.icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 999px;
-  line-height: 1;
-  font-weight: 800;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 6px;
+  color: var(--cfg-yellow);
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
 
-.warning-action-icon--configura {
-  background: url('../../icons/logo_configura.png') center / contain no-repeat;
-}
-
-.warning-action-icon--google {
-  background: rgba(255, 255, 255, 0.12);
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  background: rgba(242, 235, 107, 0.14);
   color: #fff;
-  font-family: Arial, sans-serif;
-  font-size: 0.95em;
+  text-decoration: none;
+}
+
+.icon-btn:active { transform: scale(0.95); }
+
+.icon-btn .icon,
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .sr-only {
@@ -204,21 +206,14 @@ body.ca, body.gl, body.eu { background: none; }
   border: 0;
 }
 
-/* Hide old Google/browser scope markup if any template remnants remain */
-.lang-warning-scopes {
-  display: none;
-}
+/* Hide old scopes markup if any template remnants remain */
+.lang-warning-scopes { display: none; }
 
-/* CA-only enhancements: browser warning + Google info + author credits.
+/* CA-only enhancements: Google info + author credits.
    For Galego and Euskara the popup keeps its original look. */
 body:not(.ca) #googleWarningContainer,
 body:not(.ca) .legacy-credit,
 body:not(.ca) .creator-credit { display: none !important; }
-
-body:not(.ca) .warning-action-icon--google,
-body:not(.ca) .warning-action-icon--configura {
-  background-size: contain;
-}
 
 .lang-warning-close {
   position: absolute;

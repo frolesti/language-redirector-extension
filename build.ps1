@@ -18,6 +18,18 @@ Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
+# Flat single-color browser icons (24x24, currentColor) for the popup warning
+# action buttons. Inlined so the popup can colour them via CSS.
+$browserIconSvgs = @{
+    "chrome"  = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C8.21 0 4.831 1.757 2.632 4.501l3.953 6.848A5.454 5.454 0 0 1 12 6.545h10.691A12 12 0 0 0 12 0zM1.931 5.47A11.943 11.943 0 0 0 0 12c0 6.012 4.42 10.991 10.189 11.864l3.953-6.847a5.45 5.45 0 0 1-6.865-2.29zm13.342 2.166a5.446 5.446 0 0 1 1.45 7.09l-5.344 9.257c.206.01.413.016.621.016 6.627 0 12-5.373 12-12 0-1.54-.29-3.011-.818-4.364zM12 16.364a4.364 4.364 0 1 1 0-8.728 4.364 4.364 0 0 1 0 8.728z"/></svg>'
+    "edge"    = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c2.4 0 4.6-.85 6.35-2.27-1.05.55-2.2.87-3.4.87-3.6 0-6.8-2.4-7.85-5.85-.2-.7-.3-1.45-.3-2.2 0-2.5 1.5-4.7 3.65-5.55-1.85.95-3.1 2.85-3.1 5.05 0 .65.1 1.25.3 1.85h11.7c.05-.45.1-.95.1-1.4C19.45 6 16.3 2 12 2zm0 4.5c2.65 0 4.85 2.05 5.1 4.6H6.9c.25-2.55 2.45-4.6 5.1-4.6z"/></svg>'
+    "brave"   = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.2 5.6l.5-1.4-1.5-1.6c-.4-.5-1-.7-1.6-.6l-1.5.2-2-1.4c-.7-.5-1.6-.5-2.3 0L8.8 2.2 7.3 2c-.6-.1-1.2.2-1.6.6L4.3 4.2l.5 1.4-1.2 3.6c-.4 1.3-.1 2.8.9 3.8l5.5 5.7c.6.6 1.5.6 2.1 0l5.5-5.7c1-1 1.3-2.5.9-3.8L19.2 5.6zM12 17l-3.5-3.8c-.4-.4-.5-1.1-.3-1.6l1-2.5c.2-.5.7-.9 1.3-.9h3c.6 0 1.1.4 1.3.9l1 2.5c.2.5.1 1.2-.3 1.6L12 17z"/></svg>'
+    "opera"   = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 17c-2.2 0-4-3.1-4-7s1.8-7 4-7 4 3.1 4 7-1.8 7-4 7z"/></svg>'
+    "ecosia"  = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12c0 1.7.4 3.3 1.2 4.8L2 22l5.4-1.2c1.4.7 3 1.2 4.6 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm-1.5 14l-3.5-3.5 1.4-1.4 2.1 2.1 5.1-5.1 1.4 1.4-6.5 6.5z"/></svg>'
+    "firefox" = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.5 5.5c.4.7.7 1.5.9 2.3-.5-1.2-1.3-2.3-2.4-3.1-1.9-1.4-4.4-2-6.8-1.5-2 .4-3.7 1.5-4.9 3-1 1.3-1.7 2.9-1.7 4.6 0 1.2.3 2.3.8 3.3-.5-.9-.8-1.9-.9-2.9-.1-.6-.1-1.2 0-1.8.1-.6.2-1.2.4-1.7-.6.7-1 1.6-1.3 2.5-.4 1.4-.4 2.9-.1 4.3.4 1.6 1.2 3 2.4 4.2 1.5 1.5 3.5 2.4 5.6 2.6 2.6.2 5.2-.8 7.1-2.6 1.7-1.6 2.7-3.8 2.7-6.2 0-2.2-.8-4.3-2.3-5.9-.5-.5-1-.9-1.5-1.3.6.3 1.2.7 1.7 1.2.5.4.9.9 1.3 1.4-.2-.8-.5-1.5-1-2.2zM12 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"/></svg>'
+    "safari"  = '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm5-12l-7 3-3 7 7-3 3-7zm-5 5c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>'
+}
+
 function New-ZipNormalized {
     param(
         [string]$SourceDirectory,
@@ -258,6 +270,8 @@ foreach ($lang in $languages) {
         $popupHtml = $popupHtml.Replace("{{CREATOR_NAME}}", $cfg.creatorName)
         $popupHtml = $popupHtml.Replace("{{CREATOR_URL}}", $cfg.creatorUrl)
         $popupHtml = $popupHtml.Replace("{{LANG_CODE}}", $lang)
+        $browserIconSvg = if ($browserIconSvgs.ContainsKey($browser)) { $browserIconSvgs[$browser] } else { $browserIconSvgs["chrome"] }
+        $popupHtml = $popupHtml.Replace("{{BROWSER_ICON_SVG}}", $browserIconSvg)
         Set-Content -Path "$targetDir/src/popup/popup.html" -Value $popupHtml -Encoding UTF8
 
         # Process Popup JS

@@ -20,13 +20,19 @@
         <button id="closeBrowserWarning" class="lang-warning-close" title="Minimitzar">&times;</button>
         <div class="warning-headline">
           <span class="warning-icon warning-icon--alert" aria-hidden="true">⚠️</span>
-          <div id="browserWarningText">{{BROWSER_LANG_WARN}}</div>
+          <div class="warning-body">
+            <div id="browserWarningText" class="warning-title">{{BROWSER_LANG_WARN}}</div>
+            <div class="warning-meta" id="browserDetectedLang"></div>
+          </div>
         </div>
-        <div class="warning-meta" id="browserDetectedLang"></div>
-        <a id="langFixBrowserLink" class="warning-action" href="{{BROWSER_LANG_ACTION_URL}}" target="_blank" rel="noopener">
-          <span class="warning-action-icon warning-action-icon--configura" aria-hidden="true"></span>
-          <span class="sr-only">{{BROWSER_LANG_ACTION_LABEL}}</span>
-        </a>
+        <div class="warning-actions">
+          <a class="icon-btn" href="https://configura.cat/aplicacions" target="_blank" rel="noopener" title="Veure-ho a configura.cat" aria-label="Veure informació a configura.cat">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </a>
+          <a id="langFixBrowserLink" class="icon-btn" href="#" title="Obre la configuració del navegador" aria-label="Obre la configuració d'idioma del navegador">
+            {{BROWSER_ICON_SVG}}
+          </a>
+        </div>
       </div>
       <div id="browserWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">⚠️</div>
     </div>
@@ -37,12 +43,18 @@
         <button id="closeGoogleWarning" class="lang-warning-close" title="Minimitzar">&times;</button>
         <div class="warning-headline">
           <span class="warning-icon warning-icon--info" aria-hidden="true">ℹ️</span>
-          <div id="googleWarningText">{{GOOGLE_LANG_WARN}}</div>
+          <div class="warning-body">
+            <div id="googleWarningText" class="warning-title">{{GOOGLE_LANG_WARN}}</div>
+          </div>
         </div>
-        <a id="langFixAccountLink" class="warning-action" href="{{GOOGLE_LANG_ACTION_URL}}" target="_blank" rel="noopener">
-          <span class="warning-action-icon warning-action-icon--google" aria-hidden="true">G</span>
-          <span class="sr-only">{{GOOGLE_LANG_ACTION_LABEL}}</span>
-        </a>
+        <div class="warning-actions">
+          <a class="icon-btn" href="https://configura.cat/google" target="_blank" rel="noopener" title="Veure-ho a configura.cat" aria-label="Veure informació a configura.cat">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </a>
+          <a id="langFixAccountLink" class="icon-btn" href="https://myaccount.google.com/language" target="_blank" rel="noopener" title="Obre la configuració del compte de Google" aria-label="Obre la configuració d'idioma del compte de Google">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+          </a>
+        </div>
       </div>
       <div id="googleWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">ℹ️</div>
     </div>
