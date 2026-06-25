@@ -234,12 +234,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstLang = languages[0].toLowerCase();
         const browserNeedsFix = !firstLang.startsWith(targetLang);
 
+        function languageCodeToName(code) {
+            const normalized = code.toLowerCase();
+            if (normalized.startsWith('ca')) return 'català';
+            if (normalized.startsWith('es')) return 'espanyol';
+            if (normalized.startsWith('en')) return 'anglès';
+            if (normalized.startsWith('gl')) return 'gallec';
+            if (normalized.startsWith('eu')) return 'basc';
+            if (normalized.startsWith('fr')) return 'francès';
+            if (normalized.startsWith('pt')) return 'portuguès';
+            return normalized;
+        }
+
+        function buildLanguageSentence(list) {
+            const names = list.map(languageCodeToName);
+            if (names.length === 1) return names[0];
+            if (names.length === 2) return names[0] + ' i ' + names[1];
+            return names.slice(0, -1).join(', ') + ' i ' + names[names.length - 1];
+        }
+
         const browserContainer = document.getElementById('browserWarningContainer');
         const browserContent = document.getElementById('browserWarningContent');
         const browserMinimized = document.getElementById('browserWarningMinimized');
         const browserClose = document.getElementById('closeBrowserWarning');
         const browserDetected = document.getElementById('browserDetectedLang');
         const browserFixLink = document.getElementById('langFixBrowserLink');
+        const browserWarningText = document.getElementById('browserWarningText');
 
         if (browserContainer && browserContent && browserMinimized) {
             if (browserNeedsFix) {
@@ -247,8 +267,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 browserContent.style.display = browserWarnMinimized ? 'none' : 'block';
                 browserMinimized.style.display = browserWarnMinimized ? 'block' : 'none';
 
+                if (browserWarningText) {
+                    browserWarningText.textContent = 'L\'idioma principal del teu navegador no és el català.';
+                }
                 if (browserDetected) {
-                    browserDetected.textContent = languages.join(', ');
+                    browserDetected.textContent = 'Idiomes detectats al navegador: ' + buildLanguageSentence(languages);
                 }
 
                 if (browserClose) {
@@ -278,12 +301,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const googleMinimized = document.getElementById('googleWarningMinimized');
         const googleClose = document.getElementById('closeGoogleWarning');
         const googleFixLink = document.getElementById('langFixAccountLink');
+        const googleWarningText = document.getElementById('googleWarningText');
 
         if (googleContainer && googleContent && googleMinimized) {
             if (isChromeBuild && targetLang === 'ca') {
                 googleContainer.style.display = 'block';
                 googleContent.style.display = googleWarnMinimized ? 'none' : 'block';
                 googleMinimized.style.display = googleWarnMinimized ? 'block' : 'none';
+
+                if (googleWarningText) {
+                    googleWarningText.textContent = 'Revisa l\'idioma del teu compte de Google.';
+                }
 
                 if (googleClose) {
                     googleClose.onclick = () => {

@@ -19,16 +19,16 @@
       <div id="browserWarningContent" class="lang-warning-full">
         <button id="closeBrowserWarning" class="lang-warning-close" title="Minimitzar">&times;</button>
         <div class="warning-headline">
-          <span class="warning-icon" aria-hidden="true">🌐</span>
+          <span class="warning-icon warning-icon--alert" aria-hidden="true">⚠️</span>
           <div id="browserWarningText">{{BROWSER_LANG_WARN}}</div>
         </div>
         <div class="warning-meta" id="browserDetectedLang"></div>
         <a id="langFixBrowserLink" class="warning-action" href="{{BROWSER_LANG_ACTION_URL}}" target="_blank" rel="noopener">
-          <span class="warning-action-icon" aria-hidden="true">↗</span>
-          <span>{{BROWSER_LANG_ACTION_LABEL}}</span>
+          <span class="warning-action-icon warning-action-icon--configura" aria-hidden="true"></span>
+          <span class="sr-only">{{BROWSER_LANG_ACTION_LABEL}}</span>
         </a>
       </div>
-      <div id="browserWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">🌐</div>
+      <div id="browserWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">⚠️</div>
     </div>
 
     <!-- Google account language info (Chrome only) -->
@@ -36,13 +36,12 @@
       <div id="googleWarningContent" class="lang-warning-full lang-warning-full--info">
         <button id="closeGoogleWarning" class="lang-warning-close" title="Minimitzar">&times;</button>
         <div class="warning-headline">
-          <span class="warning-icon" aria-hidden="true">ℹ️</span>
+          <span class="warning-icon warning-icon--info" aria-hidden="true">ℹ️</span>
           <div id="googleWarningText">{{GOOGLE_LANG_WARN}}</div>
         </div>
-        <div class="warning-meta">{{GOOGLE_LANG_META}}</div>
         <a id="langFixAccountLink" class="warning-action" href="{{GOOGLE_LANG_ACTION_URL}}" target="_blank" rel="noopener">
-          <span class="warning-action-icon" aria-hidden="true">↗</span>
-          <span>{{GOOGLE_LANG_ACTION_LABEL}}</span>
+          <span class="warning-action-icon warning-action-icon--google" aria-hidden="true">G</span>
+          <span class="sr-only">{{GOOGLE_LANG_ACTION_LABEL}}</span>
         </a>
       </div>
       <div id="googleWarningMinimized" class="lang-warning-minimized" title="Mostrar avís de llengua">ℹ️</div>
@@ -87,7 +86,7 @@
 
   <!-- Footer credit -->
   <div class="popup-footer">
-    <a href="https://configura.cat" target="_blank" class="configura-link">
+    <a href="https://configura.cat" target="_blank" class="configura-link" aria-label="Configura.cat">
       <img src="../../icons/configura_on.png" alt="configura.cat">
     </a>
     <div class="legacy-credit" id="legacyCredit">{{LEGACY_NAME_TEXT}}</div>

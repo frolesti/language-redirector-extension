@@ -134,6 +134,14 @@ body.ca, body.gl, body.eu { background: none; }
   margin-top: 1px;
 }
 
+.warning-icon--alert {
+  color: #ffcf5a;
+}
+
+.warning-icon--info {
+  color: #9ed0ff;
+}
+
 .warning-meta {
   margin-top: 6px;
   color: rgba(255, 255, 255, 0.8);
@@ -153,6 +161,7 @@ body.ca, body.gl, body.eu { background: none; }
   border-radius: 999px;
   padding: 6px 10px;
   background: rgba(242, 235, 107, 0.08);
+  position: relative;
 }
 
 .warning-action:hover,
@@ -162,8 +171,37 @@ body.ca, body.gl, body.eu { background: none; }
 }
 
 .warning-action-icon {
-  font-size: 0.95em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 999px;
   line-height: 1;
+  font-weight: 800;
+}
+
+.warning-action-icon--configura {
+  background: url('../../icons/logo_configura.png') center / contain no-repeat;
+}
+
+.warning-action-icon--google {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 0.95em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Hide old Google/browser scope markup if any template remnants remain */
@@ -176,6 +214,11 @@ body.ca, body.gl, body.eu { background: none; }
 body:not(.ca) #googleWarningContainer,
 body:not(.ca) .legacy-credit,
 body:not(.ca) .creator-credit { display: none !important; }
+
+body:not(.ca) .warning-action-icon--google,
+body:not(.ca) .warning-action-icon--configura {
+  background-size: contain;
+}
 
 .lang-warning-close {
   position: absolute;
