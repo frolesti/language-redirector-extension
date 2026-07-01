@@ -111,14 +111,25 @@ function checkAndRedirect(attempt = 1) {
             font-size: 14px;
             max-width: 300px;
         `;
-        warningDiv.innerHTML = `
-            <strong>⚠️ {{NAME}}</strong><br>
-            S'han detectat massa redireccions.<br>
-            L'extensió s'ha aturat temporalment en aquesta pàgina per evitar problemes.<br>
-            <button style="margin-top:10px; float:right; cursor:pointer; background:transparent; border:none; color:#856404; font-weight:bold;">✕ Tancar</button>
-        `;
-        
-        warningDiv.querySelector('button').onclick = () => warningDiv.remove();
+        const title = document.createElement('strong');
+        title.textContent = '⚠️ {{NAME}}';
+
+        const line1 = document.createElement('div');
+        line1.textContent = "S'han detectat massa redireccions.";
+
+        const line2 = document.createElement('div');
+        line2.textContent = "L'extensió s'ha aturat temporalment en aquesta pàgina per evitar problemes.";
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕ Tancar';
+        closeBtn.style.cssText = 'margin-top:10px; float:right; cursor:pointer; background:transparent; border:none; color:#856404; font-weight:bold;';
+        closeBtn.onclick = () => warningDiv.remove();
+
+        warningDiv.appendChild(title);
+        warningDiv.appendChild(line1);
+        warningDiv.appendChild(line2);
+        warningDiv.appendChild(closeBtn);
+
         document.body.appendChild(warningDiv);
         
         return;
@@ -603,8 +614,6 @@ function checkAndRedirect(attempt = 1) {
                                                      html.toLowerCase().includes('oops');
                                     
                                     // Check if lang attribute matches preferred language
-                                    const tempDiv = document.createElement('div');
-                                    tempDiv.innerHTML = html;
                                     const htmlMatch = html.match(/<html[^>]*lang=["']([^"']+)["']/i);
                                     const pageLang = htmlMatch ? htmlMatch[1].toLowerCase().split('-')[0] : '';
                                     
