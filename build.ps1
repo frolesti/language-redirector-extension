@@ -245,6 +245,12 @@ foreach ($lang in $languages) {
         $manifest = Get-Content -Raw -Path $manifestTemplate -Encoding UTF8
         $manifest = $manifest.Replace("{{NAME}}", $cfg.name)
         $manifest = $manifest.Replace("{{ID_NAME}}", $cfg.zipName)
+        $firefoxAddonId = if ($cfg.PSObject.Properties.Name -contains 'firefoxAddonId' -and $cfg.firefoxAddonId) {
+            $cfg.firefoxAddonId
+        } else {
+            "$($cfg.zipName)@language-redirector"
+        }
+        $manifest = $manifest.Replace("{{FIREFOX_ADDON_ID}}", $firefoxAddonId)
         $manifest = $manifest.Replace("{{DESCRIPTION}}", $cfg.description)
         $manifest = $manifest.Replace("{{VERSION}}", $Version)
         Set-Content -Path "$targetDir/manifest.json" -Value $manifest -Encoding UTF8

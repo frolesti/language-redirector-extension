@@ -23,7 +23,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "{{ID_NAME}}@language-redirector",
+      "id": "{{FIREFOX_ADDON_ID}}",
       "strict_min_version": "142.0"
     },
     "gecko_android": {
