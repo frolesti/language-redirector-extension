@@ -83,7 +83,7 @@ body.ca, body.gl, body.eu { background: none; }
   display: inline-flex;
   width: 1.52em;
   height: 0.96em;
-  margin: 0 1.2px;
+  margin: 0;
   transform: translateY(0.9px);
 }
 
@@ -479,10 +479,9 @@ input:checked + .slider:before {
 .popup-footer .configura-link {
   display: block;
   text-decoration: none;
-  opacity: 0.45;
   transition: opacity 0.2s;
   max-width: 110px;
-  margin: 0 auto;
+  margin: 4px auto;
 }
 
 .popup-footer .configura-link:hover {
@@ -497,7 +496,7 @@ input:checked + .slider:before {
 
 /* Legacy / authorship credits below the configura.cat logo */
 .popup-footer .legacy-credit {
-  margin-top: 12px;
+
   font-size: 0.85em;
   font-style: italic;
   color: rgba(255, 255, 255, 0.75);
@@ -509,7 +508,7 @@ input:checked + .slider:before {
 }
 
 .popup-footer .creator-credit {
-  margin-top: 8px;
+  margin-top: 4px;
   font-size: 0.9em;
   color: rgba(255, 255, 255, 0.85);
   line-height: 1.5;
