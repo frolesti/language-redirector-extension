@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const buildBrowser = '{{BROWSER_NAME}}';
+    if (buildBrowser === 'firefox') {
+        document.body.classList.add('browser-firefox');
+    }
+
   // Check both extension state and excluded domains
   chrome.storage.local.get(['preferredLanguage', 'isEnabled', 'excludedDomains'], (result) => {
       if (chrome.runtime.lastError) {
@@ -216,6 +221,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+    // Make "Fes clic aquí" an explicit configura.cat link in the legacy note.
+    const legacyCredit = document.getElementById('legacyCredit');
+    if (legacyCredit && legacyCredit.textContent) {
+        const rawText = legacyCredit.textContent;
+        const phrase = 'Fes clic aquí';
+        const phraseAlt = 'Fes click aquí';
+        const marker = rawText.includes(phrase) ? phrase : (rawText.includes(phraseAlt) ? phraseAlt : null);
+
+        if (marker) {
+            const idx = rawText.indexOf(marker);
+            const before = rawText.slice(0, idx);
+            const after = rawText.slice(idx + marker.length);
+
+            legacyCredit.textContent = '';
+            legacyCredit.appendChild(document.createTextNode(before));
+
+            const link = document.createElement('a');
+            link.href = 'https://configura.cat';
+            link.target = '_blank';
+            link.rel = 'noopener';
+            link.className = 'creator-link';
+            link.textContent = marker;
+            legacyCredit.appendChild(link);
+
+            legacyCredit.appendChild(document.createTextNode(after));
+        }
+    }
+
     // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
     // We can reliably detect the browser language, but not the Google account
     // language without extra auth/API work. So the popup shows:
@@ -226,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleWarnMinimized = storageResult.googleWarnMinimized === true;
 
     chrome.i18n.getAcceptLanguages((languages) => {
-        const buildBrowser = '{{BROWSER_NAME}}';
         const isChromeBuild = buildBrowser === 'chrome';
         const targetLang = '{{PREFERRED_LANGUAGE}}';
         if (!languages || languages.length === 0) return;

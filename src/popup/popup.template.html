@@ -36,6 +36,7 @@
           <div class="warning-body">
             <div id="browserWarningText" class="warning-title">{{BROWSER_LANG_WARN}}</div>
             <div class="warning-meta" id="browserDetectedLang"></div>
+            <a id="browserMoreInfoLink" class="warning-more-link" href="https://configura.cat/aplicacions" target="_blank" rel="noopener">Consulta les instruccions per corregir-ho</a>
           </div>
         </div>
         <div class="warning-actions">
@@ -94,7 +95,6 @@
 
     <!-- Action Buttons -->
     <button id="donate">{{DONATE_TEXT}}</button>
-    <button id="report">{{REPORT_TEXT}}</button>
 
     <!-- Exclusions Manager -->
     <div class="exclusions-manager">
@@ -105,6 +105,7 @@
         </ul>
       </details>
     </div>
+    <button id="report">{{REPORT_TEXT}}</button>
 
     <p id="status" style="display:none;"></p>
   </div>
@@ -112,13 +113,14 @@
   <!-- Footer credit -->
   <div class="popup-footer">
     <div class="legacy-credit" id="legacyCredit">{{LEGACY_NAME_TEXT}}</div>
-    <a href="https://configura.cat" target="_blank" class="configura-link" aria-label="Configura.cat">
-      <img src="../../icons/configura_on.png" alt="configura.cat">
-    </a>
+    <div class="footer-separator" aria-hidden="true"></div>
     <div class="creator-credit">
       {{CREATOR_TEXT}}
       <a href="{{CREATOR_URL}}" target="_blank" rel="noopener" class="creator-link">{{CREATOR_NAME}}</a>
     </div>
+    <a href="https://configura.cat" target="_blank" rel="noopener" class="configura-link" aria-label="Configura.cat">
+      <img src="../../icons/configura_on.png" alt="configura.cat">
+    </a>
   </div>
 
   <script src="popup.js"></script>

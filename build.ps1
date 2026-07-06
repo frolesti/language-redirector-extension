@@ -1,7 +1,7 @@
 ﻿param (
     [string]$Language = "all",
     [string]$Browser = "all",
-    [string]$Version = "2.0.0"
+    [string]$Version = "2.0.1"
 )
 
 $config = Get-Content -Raw -Path "config.json" -Encoding UTF8 | ConvertFrom-Json

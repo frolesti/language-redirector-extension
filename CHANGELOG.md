@@ -2,6 +2,14 @@
 
 ## 📦 Històric de Versions
 
+### v2.0.1 - Ajustos de publicació i coherència visual (06/07/2026)
+- **Per què es puja versió:** Release de manteniment per corregir comportaments entre navegadors i consolidar canvis de publicació sense alterar el core de redirecció.
+- **UX (Popup):** Reordenació de seccions (exclusions, notificació i footer) i separadors per millorar la lectura.
+- **Contingut (Popup):** Enllaç d'ajuda sota "Idiomes detectats" cap a configura.cat perquè l'usuari tingui context i instruccions.
+- **Branding/Footer:** Conversió de "Fes clic aquí" en enllaç real; reubicació del logo de configura.cat al peu en format més discret.
+- **Coherència entre navegadors:** Ajust específic de tipografia per Firefox per aproximar proporcions visuals a Chrome sense forçar la mida base de Chrome.
+- **Publicació Firefox (AMO):** Ajustos de manifest i empaquetat per complir validacions (ID immutable, consentiment de dades i compatibilitat de versions mínimes).
+
 ### v1.6.0 - Correccions "False Friends" i Canadà (12/01/2026)
 - **Fix (FilmAffinity):** S'ha afegit una llista d'excepció per a dominis "False Friends" (`filmaffinity.com`, `adobe.com`, etc.) on el prefix `/ca/` correspon a Canadà i no a Català.
 - **Logic:** L'extensió ara ignora la deducció d'URL en aquests dominis per prevenir redireccions errònies a versions angleses/franceses.
