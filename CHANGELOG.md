@@ -2,6 +2,13 @@
 
 ## 📦 Històric de Versions
 
+### v2.0.2 - Correcció d'icones i enllaços de compte (07/07/2026)
+- **Per què es puja versió:** Release de correcció per garantir comportament coherent i accionable del bloc de compte a tots els navegadors.
+- **Branding (Popup):** Substitució d'icones simplificades per logos de marca reals (Simple Icons) i selecció d'icona de Firefox recognoscible a mida petita.
+- **Enllaç de compte (Firefox):** Eliminat l'enllaç a configuració no útil; ara apunta a documentació oficial per canviar idioma de Firefox, que és el que governa l'idioma del compte Mozilla.
+- **Enllaç de compte (Edge):** Ajust de destí a perfil de compte Microsoft (punt real de gestió de regió/idioma disponible).
+- **Coherència multi-navegador:** Validat build i injecció d'icones per Chrome, Edge, Brave, Opera, Ecosia, Firefox i Safari.
+
 ### v2.0.1 - Ajustos de publicació i coherència visual (06/07/2026)
 - **Per què es puja versió:** Release de manteniment per corregir comportaments entre navegadors i consolidar canvis de publicació sense alterar el core de redirecció.
 - **UX (Popup):** Reordenació de seccions (exclusions, notificació i footer) i separadors per millorar la lectura.

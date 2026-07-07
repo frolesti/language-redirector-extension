@@ -250,10 +250,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- BROWSER LANGUAGE CHECK (Digital Activism) ---
-    // We can reliably detect the browser language, but not the Google account
-    // language without extra auth/API work. So the popup shows:
-    // - Browser warning only when the browser is not configured in Catalan.
-    // - Google warning only on Chrome builds (always visible there).
+        // We can reliably detect the browser language, but not account language
+        // without extra auth/API work. So the popup shows:
+        // - Browser warning only when the browser is not configured in Catalan.
+        // - Account/services warning on all builds (with browser-specific target).
   chrome.storage.local.get(['langWarnMinimized', 'googleWarnMinimized'], (storageResult) => {
     const browserWarnMinimized = storageResult.langWarnMinimized === true;
     const googleWarnMinimized = storageResult.googleWarnMinimized === true;
@@ -287,14 +287,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function getBrowserLangSettingsUrl(browser) {
             switch ((browser || '').toLowerCase()) {
-                case 'chrome':  return 'chrome://settings/languages';
-                case 'edge':    return 'edge://settings/languages';
-                case 'brave':   return 'brave://settings/languages';
-                case 'opera':   return 'opera://settings/languages';
-                case 'ecosia':  return 'chrome://settings/languages';
-                case 'firefox': return 'about:preferences#general';
-                case 'safari':  return 'https://support.apple.com/guide/safari/change-the-language-ibrw1001/mac';
-                default:        return 'chrome://settings/languages';
+                case 'chrome':
+                case 'edge':
+                case 'brave':
+                case 'opera':
+                case 'ecosia':
+                    return 'https://dev.configura-cat.pages.dev/aplicacions#chrome';
+                case 'firefox':
+                    return 'https://dev.configura-cat.pages.dev/aplicacions#firefox';
+                case 'safari':
+                    return 'https://dev.configura-cat.pages.dev/aplicacions#safari';
+                default:
+                    return 'https://dev.configura-cat.pages.dev/aplicacions#chrome';
             }
         }
 
@@ -309,6 +313,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'safari':  return 'Safari';
                 default:        return 'el navegador';
             }
+        }
+
+        function getAccountWarningConfig(browser) {
+            const normalized = (browser || '').toLowerCase();
+            if (normalized === 'chrome') {
+                return {
+                    text: 'Revisa l\'idioma del teu compte de Google.',
+                    url: 'https://myaccount.google.com/language',
+                    title: 'Obre la configuració d\'idioma del compte de Google'
+                };
+            }
+            if (normalized === 'firefox') {
+                // Mozilla accounts don't expose a language setting on the web:
+                // the account uses the browser's Accept-Language. And Firefox
+                // extensions can't open about:preferences via tabs.create, so
+                // we link to the official SUMO article that explains how to
+                // change Firefox's language (which is what governs the
+                // Mozilla account language too).
+                return {
+                    text: 'L\'idioma del teu compte de Mozilla depèn de l\'idioma del Firefox. Aprèn com canviar-lo.',
+                    url: 'https://support.mozilla.org/kb/use-firefox-another-language',
+                    title: 'Com canviar l\'idioma del Firefox'
+                };
+            }
+            if (normalized === 'edge') {
+                // Microsoft accounts don't have a dedicated language URL; the
+                // profile page lets the user change display language/region.
+                return {
+                    text: 'Revisa l\'idioma i la regió del teu compte de Microsoft.',
+                    url: 'https://account.microsoft.com/profile',
+                    title: 'Obre el perfil del compte de Microsoft'
+                };
+            }
+
+            // Browsers without a strong account-language endpoint: fallback
+            // to language settings in-browser.
+            return {
+                text: 'Revisa l\'idioma del teu navegador i serveis associats.',
+                url: getBrowserLangSettingsUrl(normalized),
+                title: 'Obre la configuració d\'idioma de ' + getBrowserDisplayName(normalized)
+            };
         }
 
         const browserContainer = document.getElementById('browserWarningContainer');
@@ -372,15 +417,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const googleClose = document.getElementById('closeGoogleWarning');
         const googleFixLink = document.getElementById('langFixAccountLink');
         const googleWarningText = document.getElementById('googleWarningText');
+        const accountWarningConfig = getAccountWarningConfig(buildBrowser);
 
         if (googleContainer && googleContent && googleMinimized) {
-            if (isChromeBuild && targetLang === 'ca') {
+            if (targetLang === 'ca') {
                 googleContainer.style.display = 'block';
                 googleContent.style.display = googleWarnMinimized ? 'none' : 'block';
                 googleMinimized.style.display = googleWarnMinimized ? 'block' : 'none';
 
                 if (googleWarningText) {
-                    googleWarningText.textContent = 'Revisa l\'idioma del teu compte de Google.';
+                    googleWarningText.textContent = accountWarningConfig.text;
                 }
 
                 if (googleClose) {
@@ -398,9 +444,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 if (googleFixLink) {
-                    googleFixLink.href = 'https://myaccount.google.com/language';
+                    googleFixLink.href = accountWarningConfig.url;
                     googleFixLink.target = '_blank';
                     googleFixLink.rel = 'noopener';
+                    googleFixLink.title = accountWarningConfig.title;
+                    googleFixLink.setAttribute('aria-label', googleFixLink.title);
                 }
             } else {
                 googleContainer.style.display = 'none';

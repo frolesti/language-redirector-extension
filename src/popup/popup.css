@@ -51,7 +51,7 @@ body.ca, body.gl, body.eu { background: none; }
 /* Firefox renders this UI slightly larger than Chromium; reduce base size a bit
    so visual proportions stay closer across browsers. */
 body.browser-firefox {
-  font-size: 0.93em;
+  font-size: 0.88em;
 }
 
 /* ---- Header ---- */
@@ -248,8 +248,8 @@ body.ca .popup-title-brand {
 
 .icon-btn .icon,
 .icon-btn svg {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   display: block;
 }
 
